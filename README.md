@@ -18,7 +18,7 @@ Download and Installation
 
 You can clone the source code from this repository to your local machine and compile it there. Note that the project depends on minimaljson.net, a JSON parser to get the api responses. You can download it [here](https://github.com/Benestar/minimaljson.net).
 
-However, there is also a zipped compiled version of the api which is ready to use yet. Just download [the file](https://github.com/Benestar/wikibase.net/...) and unzip it. Then copy the DLL into your project folder and add Wikibase.dll as a refer to your project. Finally you have to add the using directive at the top of your file: `using Wikibase;`.
+However, there is also a zipped compiled version of the api which is ready to use yet. Just download [the file](https://github.com/Benestar/wikibase.net/blob/master/Wikibase.NET.zip?raw=true) and unzip it. Then copy the DLLs into your project folder and add Wikibase.dll as a refer to your project. Finally you have to add the using directive at the top of your file: `using Wikibase;`.
 
 License
 -------
