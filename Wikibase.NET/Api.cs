@@ -1,0 +1,179 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using MinimalJson;
+
+namespace Wikibase
+{
+    /// <summary>
+    /// Base api class
+    /// </summary>
+    public class Api
+    {
+        private Http http;
+        private string wiki;
+        private string editToken;
+
+        protected int lastEditTimestamp;
+        protected int editLaps;
+
+        /// <summary>
+        /// If bot edits should be used
+        /// </summary>
+        public bool botEdits { get; set; }
+
+        /// <summary>
+        /// If the edits should be limited
+        /// </summary>
+        public bool editlimit { get; set; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="wiki">The base url of the wiki like "http://www.wikidata.org"</param>
+        public Api(string wiki) : this(wiki, "Wikibase.NET") { }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="wiki">The base url of the wiki like "https://www.wikidata.org"</param>
+        /// <param name="userAgent">The user agent</param>
+        public Api(string wiki, string userAgent)
+        {
+            this.wiki = wiki;
+            this.http = new Http(userAgent.Trim() + " Wikibase.NET/0.1");
+        }
+
+        /// <summary>
+        /// Perform a http get request to the api.
+        /// </summary>
+        /// <param name="parameters">The parameters</param>
+        /// <returns>The result</returns>
+        public JsonObject get(Dictionary<string, string> parameters)
+        {
+            parameters["format"] = "json";
+            string url = this.wiki + "/w/api.php?" + http.buildQuery(parameters);
+            string response = http.get(url);
+            JsonValue result = JsonValue.readFrom(response);
+            if (!result.isObject())
+            {
+                return null;
+            }
+            JsonObject obj = result.asObject();
+            if (obj.get("error") != null)
+            {
+                throw new ApiException(obj.get("error").asObject().get("info").asString());
+            }
+            return obj;
+        }
+
+        /// <summary>
+        /// Perform a http post request to the api.
+        /// </summary>
+        /// <param name="parameters">The parameters</param>
+        /// <param name="postFields">The post fields</param>
+        /// <returns>The result</returns>
+        public JsonObject post(Dictionary<string, string> parameters, Dictionary<string, string> postFields)
+        {
+            parameters["format"] = "json";
+            string url = this.wiki + "/w/api.php?" + http.buildQuery(parameters);
+            string response = http.post(url, postFields);
+            JsonObject result = JsonObject.readFrom(response);
+            if (result.get("error") != null)
+            {
+                throw new ApiException(result.get("error").asObject().get("info").asString());
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Get the continuation parameter of a query.
+        /// </summary>
+        /// <param name="result">The result of the query</param>
+        /// <returns>An array containing the continuation parameter key at 0 and the continuation parameter value at 1</returns>
+        public string[] getContinueParam(JsonObject result)
+        {
+            if (result.get("query-continue") != null)
+            {
+                List<string> keys = (List<string>) result.get("query-continue").asObject().names();
+                List<string> keys2 = (List<string>) result.get("query-continue").asObject().get(keys[0]).asObject().names();
+                return new string[] { keys2[0], result.get("query-continue").asObject().get(keys[0]).asObject().get(keys2[0]).asString() };
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Do login.
+        /// </summary>
+        /// <param name="username">The username</param>
+        /// <param name="password">The password</param>
+        /// <returns>If the user is logged in successfully</returns>
+        public bool login(string username, string password)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>()
+            {
+                { "action", "login" }
+            };
+            Dictionary<string, string> postFields = new Dictionary<string, string>()
+            {
+                { "lgname", username },
+                { "lgpassword", password }
+            };
+            JsonObject login = this.post(parameters, postFields).get("login").asObject();
+            if (login.get("result").asString() == "NeedToken")
+            {
+                postFields["lgtoken"] = login.get("token").asString();
+                login = this.post(parameters, postFields).get("login").asObject();
+            }
+            if (login.get("result").asString() == "Success")
+            {
+                this.editToken = null;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Do logout.
+        /// </summary>
+        public void logout()
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>()
+            {
+                { "action", "logout" }
+            };
+            this.get(parameters);
+            this.editToken = null;
+        }
+
+        /// <summary>
+        /// Return the edit token for the current user.
+        /// </summary>
+        /// <returns>The edit token</returns>
+        public string getEditToken()
+        {
+            if (this.editToken == null)
+            {
+                Dictionary<string, string> parameters = new Dictionary<string, string>()
+                {
+                    { "action", "query" },
+                    { "prop", "info" },
+                    { "intoken", "edit" },
+                    { "titles", "Main Page" }
+                };
+                JsonObject query = this.get(parameters).get("query").asObject();
+                foreach (JsonObject.Member member in query.get("pages").asObject())
+                {
+                    return member.value.asObject().get("edittoken").asString();
+                }
+            }
+            return editToken;
+        }
+    }
+}
