@@ -9,7 +9,7 @@ This api is still in development and does not promise to be stable. Thus if you 
 Overview
 --------
 
-The api has a more or less complex structure, so here is a short overview. Detailed information and documentation can be found in the wiki soon.
+The api has a more or less complex structure, so here is a short overview. Detailed information and documentation can be found in [the wiki](https://github.com/Benestar/wikibase.net/wiki).
 
 The base class that is needed everywhere is the `WikibaseApi`. It provides internal access to the api and handles user data. With the `EntityProvider` you can get an instance of the `Entity` class, which is either an `Item` or a `Property`. Besides labels, descriptions and aliases for each language, Entities also consist of claims. A `Claim` has a main `Snak` that provides a `DataValue`. If the claim is a `Statement` (it always is a statement atm.), it can be proved by a `Reference` which itself contains several snaks. A claim actually also has some qualifiers but they are not supported yet.
 
