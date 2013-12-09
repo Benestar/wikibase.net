@@ -16,13 +16,27 @@ namespace Wikibase
         /// Constructor
         /// </summary>
         /// <param name="api">The api</param>
-        public Item(WikibaseApi api) : base(api) { }
+        public Item(WikibaseApi api)
+            : base(api)
+        {
+        }
 
-        internal Item(WikibaseApi api, JsonObject data) : base(api, data) { }
+        internal Item(WikibaseApi api, JsonObject data)
+            : base(api, data)
+        {
+        }
 
         protected override void fillData(JsonObject data)
         {
             base.fillData(data);
+            if ( data.get("sitelinks") != null )
+            {
+                foreach ( JsonObject.Member member in data.get("sitelinks").asObject() )
+                {
+                    JsonObject obj = member.value.asObject();
+                    this.sitelinks.Add(obj.get("site").asString(), obj.get("title").asString());
+                }
+            }
         }
 
         /// <summary>

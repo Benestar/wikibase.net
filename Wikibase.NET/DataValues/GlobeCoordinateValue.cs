@@ -15,27 +15,47 @@ namespace Wikibase.DataValues
         /// <summary>
         /// The latitude
         /// </summary>
-        public double latitude { get; set; }
+        public double latitude
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The longitude
         /// </summary>
-        public double longitude { get; set; }
+        public double longitude
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The altitude
         /// </summary>
-        public object altitude { get; set; }
+        public object altitude
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The precision
         /// </summary>
-        public double precision { get; set; }
+        public double precision
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The globe on which the location resides
         /// </summary>
-        public string globe { get; set; }
+        public string globe
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Constructor
@@ -60,7 +80,11 @@ namespace Wikibase.DataValues
             this.latitude = obj.get("latitude").asDouble();
             this.longitude = obj.get("longitude").asDouble();
             this.altitude = obj.get("altitude");
-            this.precision = obj.get("precision").asDouble();
+            JsonValue precisionReceived = obj.get("precision");
+            if ( precisionReceived != JsonValue.NULL )
+            {
+                this.precision = precisionReceived.asDouble();
+            }
             this.globe = obj.get("globe").asString();
         }
 
