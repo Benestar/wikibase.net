@@ -51,7 +51,8 @@ namespace Wikibase
         /// Constructor
         /// </summary>
         /// <param name="api">The api</param>
-        public Entity(WikibaseApi api) : this(api, new JsonObject())
+        public Entity(WikibaseApi api)
+            : this(api, new JsonObject())
         {
         }
 
@@ -89,10 +90,12 @@ namespace Wikibase
                     this.descriptions.Add(obj.get("language").asString(), obj.get("value").asString());
                 }
             }
-            if ( data.get("aliases") != null )
+            JsonValue returnedAliases = data.get("aliases");
+            if ( (returnedAliases != null) && (returnedAliases.isObject()) )
             {
+                // strange - after save an empty array is returned, whereas by a normal get the fully alias list is returned
                 this.aliases = new Dictionary<string, List<string>>();
-                foreach ( JsonObject.Member member in data.get("aliases").asObject() )
+                foreach ( JsonObject.Member member in returnedAliases.asObject() )
                 {
                     List<string> list = new List<string>();
                     foreach ( JsonValue value in member.value.asArray() )
@@ -266,7 +269,7 @@ namespace Wikibase
         public Dictionary<string, List<string>> getAliases()
         {
             Dictionary<string, List<string>> copy = new Dictionary<string, List<string>>(aliases);
-            foreach ( KeyValuePair<string, List<string>> pair in copy )
+            foreach ( KeyValuePair<string, List<string>> pair in aliases )
             {
                 copy[pair.Key] = new List<string>(pair.Value);
             }
@@ -362,7 +365,7 @@ namespace Wikibase
         public Dictionary<string, Dictionary<string, Claim>> getClaims()
         {
             Dictionary<string, Dictionary<string, Claim>> copy = new Dictionary<string, Dictionary<string, Claim>>(claims);
-            foreach ( KeyValuePair<string, Dictionary<string, Claim>> pair in copy )
+            foreach ( KeyValuePair<string, Dictionary<string, Claim>> pair in claims )
             {
                 copy[pair.Key] = new Dictionary<string, Claim>(pair.Value);
             }
