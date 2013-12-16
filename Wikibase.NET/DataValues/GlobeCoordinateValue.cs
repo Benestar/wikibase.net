@@ -15,47 +15,27 @@ namespace Wikibase.DataValues
         /// <summary>
         /// The latitude
         /// </summary>
-        public double latitude
-        {
-            get;
-            set;
-        }
+        public double latitude { get; set; }
 
         /// <summary>
         /// The longitude
         /// </summary>
-        public double longitude
-        {
-            get;
-            set;
-        }
+        public double longitude { get; set; }
 
         /// <summary>
         /// The altitude
         /// </summary>
-        public object altitude
-        {
-            get;
-            set;
-        }
+        public object altitude { get; set; }
 
         /// <summary>
         /// The precision
         /// </summary>
-        public double precision
-        {
-            get;
-            set;
-        }
+        public double precision { get; set; }
 
         /// <summary>
         /// The globe on which the location resides
         /// </summary>
-        public string globe
-        {
-            get;
-            set;
-        }
+        public string globe { get; set; }
 
         /// <summary>
         /// Constructor

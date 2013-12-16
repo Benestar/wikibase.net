@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.Threading;
 using MinimalJson;
+using System.Diagnostics;
+using System.Threading;
 using Wikibase.DataValues;
 
 namespace Wikibase
@@ -17,18 +17,14 @@ namespace Wikibase
         /// Constructor
         /// </summary>
         /// <param name="wiki">he base url of the wiki like "https://www.wikidata.org"</param>
-        public WikibaseApi(string wiki) : base(wiki)
-        {
-        }
+        public WikibaseApi(string wiki) : base(wiki) { }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="wiki">The base url of the wiki like "https://www.wikidata.org"</param>
         /// <param name="userAgent">The user agent</param>
-        public WikibaseApi(string wiki, string userAgent) : base(wiki, userAgent)
-        {
-        }
+        public WikibaseApi(string wiki, string userAgent) : base(wiki, userAgent) { }
 
         /// <summary>
         /// Get the data for the entities in the given languages from the provided ids.
@@ -43,7 +39,7 @@ namespace Wikibase
                 { "action", "wbgetentities" },
                 { "ids", string.Join("|", ids ) }
             };
-            if ( languages != null )
+            if(languages != null)
             {
                 parameters["languages"] = string.Join("|", languages);
             }
@@ -66,7 +62,7 @@ namespace Wikibase
                 { "sites", string.Join("|", sites ) },
                 { "titles", string.Join("|", titles ) }
             };
-            if ( languages != null )
+            if (languages != null)
             {
                 parameters["languages"] = string.Join("|", languages);
             }
@@ -82,11 +78,11 @@ namespace Wikibase
         protected Entity[] parseGetEntitiesApiResponse(JsonObject result)
         {
             List<Entity> entities = new List<Entity>();
-            if ( result.get("entities") != null )
+            if (result.get("entities") != null)
             {
-                foreach ( JsonObject.Member member in result.get("entities").asObject() )
+                foreach (JsonObject.Member member in result.get("entities").asObject())
                 {
-                    if ( member.value.asObject().get("missing") == null )
+                    if (member.value.asObject().get("missing") == null)
                     {
                         entities.Add(Entity.newFromArray(this, member.value.asObject()));
                     }
@@ -158,7 +154,7 @@ namespace Wikibase
                 { "snaktype", snakType },
                 { "property", property }
             };
-            if ( value != null )
+            if (value != null)
             {
                 parameters["value"] = value.encode().ToString();
             }
@@ -182,7 +178,7 @@ namespace Wikibase
                 { "claim", claim },
                 { "snaktype", snakType }
             };
-            if ( value != null )
+            if (value != null)
             {
                 parameters["value"] = value.encode().ToString();
             }
@@ -223,7 +219,7 @@ namespace Wikibase
                 { "statement", statement },
                 { "snaks", snaks.ToString() }
             };
-            if ( reference != null )
+            if (reference != null)
             {
                 parameters["reference"] = reference;
             }
@@ -260,21 +256,21 @@ namespace Wikibase
         protected JsonObject editAction(Dictionary<string, string> parameters, Dictionary<string, string> postFields, int baseRevisionId, string summary)
         {
             parameters["token"] = this.getEditToken();
-            if ( baseRevisionId != 0 )
+            if (baseRevisionId != 0)
             {
                 parameters["baserevid"] = baseRevisionId.ToString();
             }
-            if ( summary != null )
+            if (summary != null)
             {
                 parameters["summary"] = summary;
             }
-            if ( this.botEdits )
+            if (this.botEdits)
             {
                 parameters["bot"] = true.ToString();
             }
             // limit number of edits
             int time = Environment.TickCount;
-            if ( this.lastEditTimestamp > 0 && (time - this.lastEditTimestamp) < this.editLaps )
+            if (this.lastEditTimestamp > 0 && (time - this.lastEditTimestamp) < this.editLaps)
             {
                 int wait = this.lastEditTimestamp + this.editLaps - time;
                 Console.WriteLine("Wait for {0} seconds...", wait / 1000);
