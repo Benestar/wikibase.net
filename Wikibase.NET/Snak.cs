@@ -15,8 +15,10 @@ namespace Wikibase
         /// Gets the type.
         /// </summary>
         /// <value>The type.</value>
+        /// <remarks>Allowed values are "value", "none" and "some". However, only "value" is used.</remarks>
         public String type
         {
+#warning Snak type prefix better saved as an enum
             get;
             private set;
         }

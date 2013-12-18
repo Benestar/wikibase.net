@@ -6,7 +6,7 @@ using MinimalJson;
 namespace Wikibase
 {
     /// <summary>
-    /// A statement
+    /// A statement.
     /// </summary>
     public class Statement : Claim
     {

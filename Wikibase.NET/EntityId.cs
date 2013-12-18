@@ -11,6 +11,8 @@ namespace Wikibase
     /// </summary>
     public class EntityId
     {
+#warning Entity type prefix better saved as an enum
+
         /// <summary>
         /// The allowed prefixes for entity ids
         /// </summary>
@@ -19,7 +21,7 @@ namespace Wikibase
         /// <summary>
         /// The prefix
         /// </summary>
-        public string prefix
+        public String prefix
         {
             get;
             private set;
@@ -28,7 +30,7 @@ namespace Wikibase
         /// <summary>
         /// The numeric
         /// </summary>
-        public int numericId
+        public Int32 numericId
         {
             get;
             private set;
@@ -41,7 +43,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="prefix">The prefix</param>
         /// <param name="numericId">The numeric id</param>
-        public EntityId(string prefix, int numericId)
+        public EntityId(String prefix, int numericId)
         {
             this.prefix = prefix;
             this.numericId = numericId;
@@ -54,6 +56,7 @@ namespace Wikibase
         /// <returns>The entity id</returns>
         public static EntityId newFromPrefixedId(String prefixedId)
         {
+#warning ToDo - convert to a a constructor
             if ( !String.IsNullOrWhiteSpace(prefixedId) )
             {
                 Match match = prefixedIdRegex.Match(prefixedId.ToLower(CultureInfo.InvariantCulture));
@@ -77,6 +80,7 @@ namespace Wikibase
         /// <returns>The prefixed id</returns>
         public string getPrefixedId()
         {
+            // Duplicate with ToString()
             return prefix + numericId;
         }
 

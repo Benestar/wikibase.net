@@ -10,10 +10,13 @@ namespace Wikibase.DataValues
     /// </summary>
     public class EntityIdValue : DataValue
     {
+#warning Shouldn't this class simply contain a EntityId, which already encapsulates entityType and numericId
+
         /// <summary>
         /// The entity type
         /// </summary>
-        public string entityType
+        /// <remarks>Only q and p are possible values.</remarks>
+        public String entityType
         {
             get;
             set;
@@ -22,18 +25,18 @@ namespace Wikibase.DataValues
         /// <summary>
         /// The numeric id
         /// </summary>
-        public int numericId
+        public Int32 numericId
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
-        /// <param name="entityType">The entity type</param>
-        /// <param name="numericId">The numeric id</param>
-        public EntityIdValue(string entityType, int numericId)
+        /// <param name="entityType">The entity type (p or q).</param>
+        /// <param name="numericId">The numeric id.</param>
+        public EntityIdValue(String entityType, Int32 numericId)
         {
             this.entityType = entityType;
             this.numericId = numericId;
@@ -66,7 +69,7 @@ namespace Wikibase.DataValues
         /// Converts the instance to a string.
         /// </summary>
         /// <returns>String representation of the instance.</returns>
-        public override string ToString()
+        public override String ToString()
         {
             return entityType + " " + numericId;
         }

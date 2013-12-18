@@ -26,6 +26,7 @@ namespace Wikibase
         /// Gets the id.
         /// </summary>
         /// <value>The id.</value>
+        /// <remarks>Consists of the property id plus an internal identifier. Is <c>null</c> if not saved to server yet.</remarks>
         public String id
         {
             get;
@@ -36,6 +37,7 @@ namespace Wikibase
         /// Gets the id used internally.
         /// </summary>
         /// <value>The internally used id.</value>
+        /// <remarks>Consists of the property id plus an internal identifier. It is equal to <see cref="id"/> if the claim was parsed from server results.</remarks>
         public String internalId
         {
             get;

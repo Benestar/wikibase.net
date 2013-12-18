@@ -169,17 +169,18 @@ namespace Wikibase
         /// Get all labels.
         /// </summary>
         /// <returns>The labels</returns>
-        public Dictionary<string, string> getLabels()
+        /// <remarks>Key is the language, value the label.</remarks>
+        public Dictionary<String, String> getLabels()
         {
-            return new Dictionary<string, string>(labels);
+            return new Dictionary<String, String>(labels);
         }
 
         /// <summary>
         /// Get the label for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>The label</returns>
-        public string getLabel(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns>The label.</returns>
+        public String getLabel(String lang)
         {
             return labels.ContainsKey(lang) ? labels[lang] : null;
         }
@@ -187,9 +188,9 @@ namespace Wikibase
         /// <summary>
         /// Set the label for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <param name="value">The label</param>
-        public void setLabel(string lang, string value)
+        /// <param name="lang">The language.</param>
+        /// <param name="value">The label.</param>
+        public void setLabel(String lang, String value)
         {
             this.labels[lang] = value;
             if (this.changes.get("labels") == null)
@@ -207,9 +208,9 @@ namespace Wikibase
         /// <summary>
         /// Remove the label for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>If the label was removed successfully</returns>
-        public bool removeLabel(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns><c>true</c> if the label was removed successfully, <c>false</c> otherwise.</returns>
+        public bool removeLabel(String lang)
         {
             if (this.labels.Remove(lang))
             {
@@ -231,18 +232,19 @@ namespace Wikibase
         /// <summary>
         /// Get all descriptions.
         /// </summary>
-        /// <returns>The descriptions</returns>
-        public Dictionary<string, string> getDescriptions()
+        /// <returns>The descriptions.</returns>
+        /// <remarks>Keys is the language, value the description.</remarks>
+        public Dictionary<String, String> getDescriptions()
         {
-            return new Dictionary<string, string>(descriptions);
+            return new Dictionary<String, String>(descriptions);
         }
 
         /// <summary>
         /// Get the description for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>The description</returns>
-        public string getDescription(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns>The description.</returns>
+        public string getDescription(String lang)
         {
             return descriptions.ContainsKey(lang) ? descriptions[lang] : null;
         }
@@ -250,9 +252,9 @@ namespace Wikibase
         /// <summary>
         /// Set the description for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <param name="value">The label</param>
-        public void setDescription(string lang, string value)
+        /// <param name="lang">The language.</param>
+        /// <param name="value">The label.</param>
+        public void setDescription(String lang, String value)
         {
             this.descriptions[lang] = value;
             if (this.changes.get("descriptions") == null)
@@ -270,9 +272,9 @@ namespace Wikibase
         /// <summary>
         /// Remove the description for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>If the description was removed successfully</returns>
-        public bool removeDescription(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns><c>true</c> if the description was removed successfully, <c>false</c> otherwise.</returns>
+        public bool removeDescription(String lang)
         {
             if ( this.descriptions.Remove(lang) )
             {
@@ -295,10 +297,11 @@ namespace Wikibase
         /// Get all aliases.
         /// </summary>
         /// <returns>The aliases</returns>
-        public Dictionary<string, List<string>> getAliases()
+        /// <value>Key is the language, value a list of aliases.</value>
+        public Dictionary<String, List<String>> getAliases()
         {
-            Dictionary<string, List<string>> copy = new Dictionary<string, List<string>>(aliases);
-            foreach ( KeyValuePair<string, List<string>> pair in aliases )
+            Dictionary<String, List<String>> copy = new Dictionary<String, List<String>>(aliases);
+            foreach ( KeyValuePair<String, List<String>> pair in aliases )
             {
                 copy[pair.Key] = new List<string>(pair.Value);
             }
@@ -308,23 +311,23 @@ namespace Wikibase
         /// <summary>
         /// Get the aliases for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>The aliases</returns>
-        public List<string> getAlias(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns>The aliases, or <c>null</c> if no aliases are defined for the language.</returns>
+        public List<String> getAlias(String lang)
         {
-            return aliases.ContainsKey(lang) ? new List<string>(aliases[lang]) : null;
+            return aliases.ContainsKey(lang) ? new List<String>(aliases[lang]) : null;
         }
 
         /// <summary>
-        /// Add the alias for the given language.
+        /// Add an alias for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <param name="value">The alias</param>
-        public void addAlias(string lang, string value)
+        /// <param name="lang">The language.</param>
+        /// <param name="value">The alias.</param>
+        public void addAlias(String lang, String value)
         {
             if (!this.aliases.ContainsKey(lang))
             {
-                this.aliases.Add(lang, new List<string>());
+                this.aliases.Add(lang, new List<String>());
             }
             this.aliases[lang].Add(value);
             if (this.changes.get("aliases") == null)
@@ -352,10 +355,10 @@ namespace Wikibase
         /// <summary>
         /// Remove the alias for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <param name="value">The alias</param>
-        /// <returns>If the alias was removed successfully</returns>
-        public bool removeAlias(string lang, string value)
+        /// <param name="lang">The language.</param>
+        /// <param name="value">The alias.</param>
+        /// <returns><c>true</c> if the alias was removed successfully, <c>false</c> otherwise.</returns>
+        public bool removeAlias(String lang, String value)
         {
             if (this.aliases.ContainsKey(lang))
             {
@@ -390,13 +393,14 @@ namespace Wikibase
         /// <summary>
         /// Get all claims.
         /// </summary>
-        /// <returns>The claims</returns>
-        public Dictionary<string, Dictionary<string, Claim>> getClaims()
+        /// <returns>The claims.</returns>
+        /// <remarks>Key is property id, value a dictionary in which the key is the internal id and value is the actual claim.</remarks>
+        public Dictionary<String, Dictionary<String, Claim>> getClaims()
         {
-            Dictionary<string, Dictionary<string, Claim>> copy = new Dictionary<string, Dictionary<string, Claim>>(claims);
-            foreach ( KeyValuePair<string, Dictionary<string, Claim>> pair in claims )
+            Dictionary<String, Dictionary<String, Claim>> copy = new Dictionary<String, Dictionary<String, Claim>>(claims);
+            foreach ( KeyValuePair<String, Dictionary<String, Claim>> pair in claims )
             {
-                copy[pair.Key] = new Dictionary<string, Claim>(pair.Value);
+                copy[pair.Key] = new Dictionary<String, Claim>(pair.Value);
             }
             return copy;
         }
@@ -416,17 +420,17 @@ namespace Wikibase
         /// <summary>
         /// Get the claims for the given property.
         /// </summary>
-        /// <param name="property">The property</param>
-        /// <returns>The claims</returns>
-        public Dictionary<string, Claim> getClaimsForProperty(string property)
+        /// <param name="property">The property.</param>
+        /// <returns>The claims.</returns>
+        public Dictionary<String, Claim> getClaimsForProperty(String property)
         {
-            return claims.ContainsKey(property) ? new Dictionary<string, Claim>(claims[property]) : null;
+            return claims.ContainsKey(property) ? new Dictionary<String, Claim>(claims[property]) : null;
         }
 
         /// <summary>
         /// Add the claim.
         /// </summary>
-        /// <param name="claim">The claim</param>
+        /// <param name="claim">The claim.</param>
         internal void addClaim(Claim claim)
         {
             string property = claim.mainSnak.propertyId.getPrefixedId();
@@ -440,8 +444,8 @@ namespace Wikibase
         /// <summary>
         /// Remove the claim.
         /// </summary>
-        /// <param name="claim">The claim</param>
-        /// <returns>If the claim was removed successfully</returns>
+        /// <param name="claim">The claim.</param>
+        /// <returns><c>true</c> if the claim was removed successfully, <c>false</c> otherwise.</returns>
         internal bool removeClaim(Claim claim)
         {
             string property = claim.mainSnak.propertyId.getPrefixedId();
@@ -463,8 +467,8 @@ namespace Wikibase
         /// <summary>
         /// Save all changes.
         /// </summary>
-        /// <param name="summary">The edit summary</param>
-        public void save(string summary)
+        /// <param name="summary">The edit summary.</param>
+        public void save(String summary)
         {
             if (!this.changes.isEmpty())
             {
@@ -498,6 +502,6 @@ namespace Wikibase
         /// Gets the type identifier of the type at server side.
         /// </summary>
         /// <returns>The type identifier.</returns>
-        protected abstract string getType();
+        protected abstract String getType();
     }
 }
