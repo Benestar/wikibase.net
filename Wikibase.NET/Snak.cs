@@ -108,7 +108,7 @@ namespace Wikibase
                 .add("property", this.propertyId.getPrefixedId());
             if (this.dataValue != null)
             {
-                data.add("datavalue", this.dataValue.encode());
+                data.add("datavalue", this.dataValue.fullEncode());
             }
             return data;
         }

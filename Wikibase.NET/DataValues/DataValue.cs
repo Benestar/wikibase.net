@@ -90,9 +90,21 @@ namespace Wikibase.DataValues
         public abstract string getType();
 
         /// <summary>
-        /// Encode the data value to json.
+        /// Encode the value part of the data value to json.
         /// </summary>
         /// <returns>The json value</returns>
         internal abstract JsonValue encode();
+
+        /// <summary>
+        /// Encode the data value to json.
+        /// </summary>
+        /// <returns>The json value</returns>
+        internal JsonValue fullEncode()
+        {
+            JsonObject data = new JsonObject()
+                .add("type", this.getType())
+                .add("value", this.encode());
+            return data;
+        }
     }
 }
