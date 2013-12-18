@@ -16,12 +16,26 @@ namespace Wikibase
         /// Constructor
         /// </summary>
         /// <param name="api">The api</param>
-        public Item(WikibaseApi api) : base(api) { }
+        public Item(WikibaseApi api)
+            : base(api)
+        {
+        }
 
-        internal Item(WikibaseApi api, JsonObject data) : base(api, data) { }
+        internal Item(WikibaseApi api, JsonObject data)
+            : base(api, data)
+        {
+        }
 
+        /// <summary>
+        /// Parses the <paramref name="data"/> and adds the results to this instance.
+        /// </summary>
+        /// <param name="data"><see cref="JsonObject"/> to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
         protected override void fillData(JsonObject data)
         {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
             base.fillData(data);
             if ( data.get("sitelinks") != null )
             {
@@ -31,7 +45,8 @@ namespace Wikibase
                     JsonObject obj = member.value.asObject();
                     this.sitelinks.Add(obj.get("site").asString(), obj.get("title").asString());
                 }
-            }        }
+            }
+        }
 
         /// <summary>
         /// Get all sitelinks.
@@ -55,8 +70,8 @@ namespace Wikibase
         /// <summary>
         /// Set the sitelink for the given site.
         /// </summary>
-        /// <param name="site">The site</param>
-        /// <param name="sitelink">The sitelink</param>
+        /// <param name="site">The site.</param>
+        /// <param name="title">The sitelink.</param>
         public void setSitelink(string site, string title)
         {
             this.sitelinks[site] = title;
@@ -96,6 +111,10 @@ namespace Wikibase
             return false;
         }
 
+        /// <summary>
+        /// Gets the type identifier of the type at server side.
+        /// </summary>
+        /// <returns>The type identifier.</returns>
         protected override string getType()
         {
             return "item";

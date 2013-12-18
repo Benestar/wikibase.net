@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using MinimalJson;
 using Wikibase.DataValues;
@@ -12,32 +13,51 @@ namespace Wikibase
     public class Claim
     {
         /// <summary>
-        /// The entity
+        /// Gets the entity.
         /// </summary>
-        public Entity entity { get; private set; }
+        /// <value>The entitiy.</value>
+        public Entity entity
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
-        /// The id
+        /// Gets the id.
         /// </summary>
-        public string id { get; private set; }
+        /// <value>The id.</value>
+        public String id
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
-        /// The id used internally
+        /// Gets the id used internally.
         /// </summary>
-        public string internalId { get; private set; }
+        /// <value>The internally used id.</value>
+        public String internalId
+        {
+            get;
+            private set;
+        }
 
         private Snak mMainSnak;
 
         /// <summary>
         /// The main snak
         /// </summary>
-        public Snak mainSnak {
+        public Snak mainSnak
+        {
             get
             {
                 return mMainSnak;
             }
             set
             {
+                if ( value == null )
+                    throw new ArgumentNullException("value");
+
                 if (!this.mMainSnak.propertyId.Equals(value.propertyId))
                 {
                     throw new ArgumentException("Different property id");
@@ -49,14 +69,27 @@ namespace Wikibase
 
         private JsonObject changes = new JsonObject();
 
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
+        /// <param name="entity">Entity to which the claim belongs.</param>
+        /// <param name="data">JSon data to be parsed.</param>
         internal Claim(Entity entity, JsonObject data)
         {
             this.entity = entity;
             this.fillData(data);
         }
 
+        /// <summary>
+        /// Parses the <paramref name="data"/> and adds the results to this instance.
+        /// </summary>
+        /// <param name="data"><see cref="JsonObject"/> to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
         protected virtual void fillData(JsonObject data)
         {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
             if (data.get("mainsnak") != null)
             {
                 this.mMainSnak = Snak.newFromArray(data.get("mainsnak").asObject());
@@ -80,6 +113,9 @@ namespace Wikibase
 
         internal static Claim newFromArray(Entity entity, JsonObject data)
         {
+            if ( entity == null )
+                throw new ArgumentNullException("entity");
+
             if (data.get("type") != null)
             {
                 switch (data.get("type").asString())
@@ -90,11 +126,23 @@ namespace Wikibase
                         return new Claim(entity, data);
                 }
             }
-            throw new Exception("Unknown type");
+            throw new ArgumentException("Unknown type in data", "data");
         }
 
-        public static Claim newFromSnak(Entity entity, Snak snak, string type)
+        /// <summary>
+        /// Create a claim from a <see cref="Snak"/>.
+        /// </summary>
+        /// <param name="entity">Entity to which the claim should be added.</param>
+        /// <param name="snak">Snak to be parsed.</param>
+        /// <param name="type">Type of snak.</param>
+        /// <returns>Newly created claim.</returns>
+        public static Claim newFromSnak(Entity entity, Snak snak, String type)
         {
+            if ( entity == null )
+                throw new ArgumentNullException("entity");
+            if ( snak == null )
+                throw new ArgumentNullException("snak");
+
             Claim claim = newFromArray(
                 entity,
                 new JsonObject()
@@ -107,7 +155,11 @@ namespace Wikibase
             return claim;
         }
 
-        public void save(string summary)
+        /// <summary>
+        /// Saves the claim to the server.
+        /// </summary>
+        /// <param name="summary">Edit summary.</param>
+        public void save(String summary)
         {
             if (!this.changes.isEmpty())
             {
@@ -116,7 +168,7 @@ namespace Wikibase
                     JsonObject change = this.changes.get("mainsnak").asObject();
                     if (change.get("snaktype") == null || change.get("property") == null)
                     {
-                        throw new Exception("The main snak does not have required data");
+                        throw new InvalidOperationException("The main snak does not have required data");
                     }
                     DataValue value = change.get("datavalue") == null ? null : DataValueFactory.newFromArray(change.get("datavalue").asObject().get("value").asObject());
                     JsonObject result;
@@ -134,8 +186,15 @@ namespace Wikibase
             }
         }
 
+        /// <summary>
+        /// Updates instance from API call result.
+        /// </summary>
+        /// <param name="result">Json result.</param>
         protected void updateDataFromResult(JsonObject result)
         {
+            if ( result == null )
+                throw new ArgumentNullException("result");
+
             if (result.get("claim") != null)
             {
                 this.fillData(result.get("claim").asObject());
@@ -143,7 +202,11 @@ namespace Wikibase
             this.entity.updateLastRevisionIdFromResult(result);
         }
 
-        public void deleteAndSave(string summary)
+        /// <summary>
+        /// Deletes the claim both within its <see cref="entity"/> as well as on the server.
+        /// </summary>
+        /// <param name="summary">The edit summary.</param>
+        public void deleteAndSave(String summary)
         {
             if (this.id != null)
             {

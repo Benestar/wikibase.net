@@ -10,32 +10,55 @@ namespace Wikibase.DataValues
     /// </summary>
     public class GlobeCoordinateValue : DataValue
     {
-        public const string LOBE_EARTH = "http://www.wikidata.org/entity/Q2";
+        /// <summary>
+        /// Full wikidata entity path for the Earth globe.
+        /// </summary>
+        public const string GLOBE_EARTH = "http://www.wikidata.org/entity/Q2";
 
         /// <summary>
         /// The latitude
         /// </summary>
-        public double latitude { get; set; }
+        public double latitude
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The longitude
         /// </summary>
-        public double longitude { get; set; }
+        public double longitude
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The altitude
         /// </summary>
-        public object altitude { get; set; }
+        public object altitude
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The precision
         /// </summary>
-        public double precision { get; set; }
+        public double precision
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The globe on which the location resides
         /// </summary>
-        public string globe { get; set; }
+        public string globe
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Constructor
@@ -68,6 +91,10 @@ namespace Wikibase.DataValues
             this.globe = obj.get("globe").asString();
         }
 
+        /// <summary>
+        /// Gets the type identifier of the type at server side.
+        /// </summary>
+        /// <returns>The type identifier.</returns>
         public override string getType()
         {
             return "globecoordinate";

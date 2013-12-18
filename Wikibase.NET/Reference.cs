@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using MinimalJson;
+using System.Linq;
 
 namespace Wikibase
 {
@@ -33,8 +34,16 @@ namespace Wikibase
             this.fillData(data);
         }
 
+        /// <summary>
+        /// Parses the <paramref name="data"/> and adds the results to this instance.
+        /// </summary>
+        /// <param name="data"><see cref="JsonObject"/> to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
         protected void fillData(JsonObject data)
         {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
             if (data.get("snaks") != null)
             {
                 foreach (JsonObject.Member member in data.get("snaks").asObject())
@@ -65,8 +74,23 @@ namespace Wikibase
             }
         }
 
+        /// <summary>
+        /// Create a new references with the given snaks.
+        /// </summary>
+        /// <param name="statement">Statement to which the reference should be added.</param>
+        /// <param name="snaks">Snaks to be part of the reference.</param>
+        /// <returns>New reference instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="statement"/> or <paramref name="snaks"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="snaks"/> is empty.</exception>
         public static Reference newFromSnaks(Statement statement, Snak[] snaks)
         {
+            if ( snaks == null )
+                throw new ArgumentNullException("snaks");
+            if ( statement  == null )
+                throw new ArgumentNullException("statement");
+            if ( !snaks.Any())
+                throw new ArgumentException("snaks");
+
             Reference reference = new Reference(statement, new JsonObject());
             foreach (Snak snak in snaks)
             {
@@ -93,9 +117,13 @@ namespace Wikibase
         /// <summary>
         /// Add a snak.
         /// </summary>
-        /// <param name="snak">The snak</param>
+        /// <param name="snak">The snak.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="snak"/> is <c>null</c>.</exception>
         public void addSnak(Snak snak)
         {
+            if ( snak == null )
+                throw new ArgumentNullException("snak");
+
             string property = snak.propertyId.getPrefixedId();
             if (this.snaks[property] == null)
             {
@@ -107,10 +135,14 @@ namespace Wikibase
         /// <summary>
         /// Remove the snak.
         /// </summary>
-        /// <param name="snak">The snak</param>
-        /// <returns>If the snak was removed successfully</returns>
+        /// <param name="snak">The snak.</param>
+        /// <returns><c>true</c> if the snak was removed successfully, <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="snak"/> is <c>null</c>.</exception>
         public bool removeSnak(Snak snak)
         {
+            if ( snak == null )
+                throw new ArgumentNullException("snak");
+
             string property = snak.propertyId.getPrefixedId();
             if (this.snaks[property] == null)
             {
@@ -151,8 +183,15 @@ namespace Wikibase
             this.updateDataFromResult(result);
         }
 
+        /// <summary>
+        /// Updates instance from API call result.
+        /// </summary>
+        /// <param name="result">Json result.</param>
         protected void updateDataFromResult(JsonObject result)
         {
+            if ( result == null )
+                throw new ArgumentNullException("result");
+
             if (result.get("reference") != null)
             {
                 this.fillData(result.get("reference").asObject());
@@ -161,14 +200,14 @@ namespace Wikibase
         }
 
         /// <summary>
-        /// Delete the reference and save it.
+        /// Delete the reference and save the reference which contained it.
         /// </summary>
-        /// <param name="summary">The summary</param>
-        public void deleteAndSave(string summary)
+        /// <param name="summary">The edit summary.</param>
+        public void deleteAndSave(String summary)
         {
             if (this.statement.id == null)
             {
-                throw new Exception("The statement has no Id. Please the statement it first.");
+                throw new InvalidOperationException("The statement has no Id. Please the statement it first.");
             }
             if (this.hash != null)
             {

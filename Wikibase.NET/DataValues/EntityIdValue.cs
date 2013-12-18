@@ -13,12 +13,20 @@ namespace Wikibase.DataValues
         /// <summary>
         /// The entity type
         /// </summary>
-        public string entityType { get; set; }
+        public string entityType
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The numeric id
         /// </summary>
-        public int numericId { get; set; }
+        public int numericId
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Constructor
@@ -38,6 +46,10 @@ namespace Wikibase.DataValues
             this.numericId = obj.get("numeric-id").asInt();
         }
 
+        /// <summary>
+        /// Get the type of the data value.
+        /// </summary>
+        /// <returns>Data type identifier.</returns>
         public override string getType()
         {
             return "wikibase-entityid";
@@ -50,6 +62,10 @@ namespace Wikibase.DataValues
                 .add("numeric-id", numericId);
         }
 
+        /// <summary>
+        /// Converts the instance to a string.
+        /// </summary>
+        /// <returns>String representation of the instance.</returns>
         public override string ToString()
         {
             return entityType + " " + numericId;

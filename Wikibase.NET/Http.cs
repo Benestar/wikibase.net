@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net;
 using System.IO;
+using System.Net;
+using System.Text;
 using System.Web;
 
 namespace Wikibase
@@ -10,12 +10,16 @@ namespace Wikibase
     /// <summary>
     /// Http related code
     /// </summary>
-    class Http
+    internal class Http
     {
         /// <summary>
         /// The user agent
         /// </summary>
-        public string UserAgent { get; set; }
+        public string UserAgent
+        {
+            get;
+            set;
+        }
 
         private CookieContainer cookies = new CookieContainer();
 
@@ -86,10 +90,14 @@ namespace Wikibase
         /// </summary>
         /// <param name="fields">The fields</param>
         /// <returns>The query string</returns>
-        public string buildQuery(Dictionary<string, string> fields)
+        /// <exception cref="ArgumentNullException"><paramref name="fields"/> is <c>null</c>.</exception>
+        public String buildQuery(Dictionary<String, String> fields)
         {
-            string query = "";
-            foreach (KeyValuePair<string, string> field in fields)
+            if ( fields == null )
+                throw new ArgumentNullException("fields");
+
+            String query = "";
+            foreach ( KeyValuePair<String, String> field in fields )
             {
                 query += HttpUtility.UrlEncode(field.Key) + "=" + HttpUtility.UrlEncode(field.Value) + "&";
             }

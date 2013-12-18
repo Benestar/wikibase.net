@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MinimalJson;
 
@@ -13,42 +14,85 @@ namespace Wikibase
         /// <summary>
         /// The entity id
         /// </summary>
-        public EntityId id { get; private set; }
+        public EntityId id
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// The last revision id
         /// </summary>
-        public int lastRevisionId { get; set; }
+        public int lastRevisionId
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The api
         /// </summary>
-        public WikibaseApi api { get; private set; }
+        public WikibaseApi api
+        {
+            get;
+            private set;
+        }
 
-        private Dictionary<string, string> labels = new Dictionary<string,string>();
+        /// <summary>
+        /// Labels, the actual name. Key is the language editifier, value the label.
+        /// </summary>
+        private Dictionary<String, String> labels = new Dictionary<String, String>();
 
-        private Dictionary<string, string> descriptions = new Dictionary<string,string>();
+        /// <summary>
+        /// Descriptions, to explain the item. Key is the language editifier, value the description.
+        /// </summary>
+        private Dictionary<String, String> descriptions = new Dictionary<String, String>();
 
-        private Dictionary<string, List<string>> aliases = new Dictionary<string,List<string>>();
+        /// <summary>
+        /// Aliases. Key is the language editifier, value a list of aliases in the given language.
+        /// </summary>
+        private Dictionary<String, List<String>> aliases = new Dictionary<String, List<String>>();
 
-        private Dictionary<string, Dictionary<string, Claim>> claims = new Dictionary<string,Dictionary<string,Claim>>();
+        /// <summary>
+        /// Claims. Key is the property Id, value a dictionary with the claims internal id as the key and the actual claim as the value.
+        /// </summary>
+        private Dictionary<String, Dictionary<String, Claim>> claims = new Dictionary<String, Dictionary<String, Claim>>();
 
+        /// <summary>
+        /// Changes cache.
+        /// </summary>
         protected JsonObject changes = new JsonObject();
 
         /// <summary>
-        /// Constructor
+        /// Constructor creating a blank entity instance.
+        /// </summary>
+        /// <param name="api">The api.</param>
+        public Entity(WikibaseApi api)
+            : this(api, new JsonObject())
+        {
+        }
+
+        /// <summary>
+        /// Constructor creating an entitiy from a Json object.
         /// </summary>
         /// <param name="api">The api</param>
-        public Entity(WikibaseApi api) : this(api, new JsonObject()) { }
-
+        /// <param name="data">The json object to be parsed.</param>
         internal Entity(WikibaseApi api, JsonObject data)
         {
             this.api = api;
             this.fillData(data);
         }
 
+        /// <summary>
+        /// Parses the <paramref name="data"/> and adds the results to this instance.
+        /// </summary>
+        /// <param name="data"><see cref="JsonObject"/> to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
         protected virtual void fillData(JsonObject data)
         {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
             if (data.get("id") != null)
             {
                 this.id = EntityId.newFromPrefixedId(data.get("id").asString());
@@ -358,6 +402,18 @@ namespace Wikibase
         }
 
         /// <summary>
+        /// Gets all claims.
+        /// </summary>
+        /// <value>All claims.</value>
+        public IEnumerable<Claim> Claims
+        {
+            get
+            {
+                return claims.Values.SelectMany(x => x.Values).ToList();
+            }
+        }
+
+        /// <summary>
         /// Get the claims for the given property.
         /// </summary>
         /// <param name="property">The property</param>
@@ -438,6 +494,10 @@ namespace Wikibase
             }
         }
 
+        /// <summary>
+        /// Gets the type identifier of the type at server side.
+        /// </summary>
+        /// <returns>The type identifier.</returns>
         protected abstract string getType();
     }
 }

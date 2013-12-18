@@ -12,9 +12,9 @@ namespace Wikibase
         private WikibaseApi api;
 
         /// <summary>
-        /// Constructor
+        /// Creates a new <see cref="EntityProvider"/>.
         /// </summary>
-        /// <param name="api">The api</param>
+        /// <param name="api">The api.</param>
         public EntityProvider(WikibaseApi api)
         {
             this.api = api;
@@ -23,21 +23,29 @@ namespace Wikibase
         /// <summary>
         /// Get the entities from the given entity ids.
         /// </summary>
-        /// <param name="ids">The entity ids</param>
-        /// <returns>The entities</returns>
+        /// <param name="ids">The entity ids.</param>
+        /// <returns>The entities.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="ids"/> is <c>null</c>.</exception>
         public Entity[] getEntitiesFromIds(EntityId[] ids)
         {
+            if ( ids == null )
+                throw new ArgumentNullException("ids");
+
             return this.getEntitiesFromIds(ids, null);
         }
 
         /// <summary>
         /// Get the entities from the given entity ids with data in the languages provided.
         /// </summary>
-        /// <param name="ids">The entity ids</param>
-        /// <param name="languages">The languages</param>
-        /// <returns>The entities</returns>
+        /// <param name="ids">The entity ids.</param>
+        /// <param name="languages">The languages. <c>null</c> to get all languages.</param>
+        /// <returns>The entities.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="ids"/> is <c>null</c>.</exception>
         public Entity[] getEntitiesFromIds(EntityId[] ids, string[] languages)
         {
+            if ( ids == null )
+                throw new ArgumentNullException("ids");
+
             string[] prefixedIds = new string[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {

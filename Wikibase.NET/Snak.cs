@@ -7,33 +7,53 @@ using Wikibase.DataValues;
 namespace Wikibase
 {
     /// <summary>
-    /// A snak
+    /// A snak, a property with its value.
     /// </summary>
     public class Snak
     {
         /// <summary>
-        /// The type
+        /// Gets the type.
         /// </summary>
-        public string type { get; private set; }
+        /// <value>The type.</value>
+        public String type
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
-        /// The property id
+        /// Gets the property id.
         /// </summary>
-        public EntityId propertyId { get; private set; }
+        /// <value>The property id.</value>
+        public EntityId propertyId
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
-        /// The data value
+        /// Gets the data value.
         /// </summary>
-        public DataValue dataValue { get; private set; }
+        /// <value>The data value.</value>
+        public DataValue dataValue
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
-        /// Constructor
+        /// Creates a new <see cref="Snak"/> with the given values.
         /// </summary>
         /// <param name="type">The type</param>
         /// <param name="propertyId">The property id</param>
         /// <param name="dataValue">The data value</param>
-        public Snak(string type, EntityId propertyId, DataValue dataValue)
+        /// <exception cref="ArgumentNullException"><paramref name="propertyId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="propertyId"/> has a <see cref="EntityId.prefix"/> which is not the property prefix.</exception>
+        public Snak(String type, EntityId propertyId, DataValue dataValue)
         {
+            if ( propertyId == null )
+                throw new ArgumentNullException("propertyId");
+
             if (propertyId.prefix != "p")
             {
                  throw new ArgumentException("propertyId must be a valid property id", "propertyId");
@@ -43,17 +63,40 @@ namespace Wikibase
             this.dataValue = dataValue;
         }
 
-        internal static Snak newFromArray(JsonObject data)
+        /// <summary>
+        /// Empty constructor.
+        /// </summary>
+        protected Snak()
         {
+        }
+
+        /// <summary>
+        /// Fills the snak with data parsed from a JSon array.
+        /// </summary>
+        /// <param name="data">JSon array to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
+        protected virtual void fillFromArray(JsonObject data)
+        {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
             if (data.get("snaktype") == null || data.get("property") == null)
             {
                 throw new ArgumentException("Invalid Snak serialization", "data");
             }
-            return new Snak(
-                data.get("snaktype").asString(),
-                EntityId.newFromPrefixedId(data.get("property").asString()),
-                DataValueFactory.newFromArray(data.get("datavalue").asObject())
-            );
+            this.type = data.get("snaktype").asString();
+            this.propertyId = EntityId.newFromPrefixedId(data.get("property").asString());
+            this.dataValue = DataValueFactory.newFromArray(data.get("datavalue").asObject());
+        }
+
+        internal static Snak newFromArray(JsonObject data)
+        {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
+            var result = new Snak();
+            result.fillFromArray(data);
+            return result;
         }
 
         internal JsonObject toArray()

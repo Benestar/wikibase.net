@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using MinimalJson;
 
 namespace Wikibase.DataValues
 {
     /// <summary>
-    /// A data value
+    /// Abstract base class for a data value.
     /// </summary>
     public abstract class DataValue
     {
@@ -19,40 +20,65 @@ namespace Wikibase.DataValues
             return md5(this.encode().ToString());
         }
 
-        private string md5(string text)
+        private static string md5(string text)
         {
-            if ((text == null) || (text.Length == 0))
+            if ( (text == null) || (text.Length == 0) )
             {
                 return string.Empty;
             }
-            byte[] result = new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(Encoding.Default.GetBytes(text));
+            byte[] result;
+            MD5CryptoServiceProvider md5provider = null;
+            try
+            {
+                md5provider = new MD5CryptoServiceProvider();
+                result = md5provider.ComputeHash(Encoding.Default.GetBytes(text));
+            }
+            finally
+            {
+                if ( md5provider != null )
+                    md5provider.Dispose();
+            }
             return System.BitConverter.ToString(result);
         }
 
-        public override bool Equals(object obj)
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same
+        /// type.
+        ///</summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns><c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.</returns>
+        public override Boolean Equals(object other)
         {
-            if (this == obj)
+            if ( this == other )
             {
                 return true;
             }
-            if (obj == null)
+            if ( other == null )
             {
                 return false;
             }
-            if (this.GetType() != obj.GetType())
+            if ( this.GetType() != other.GetType() )
             {
                 return false;
             }
-            DataValue other = (DataValue)obj;
-            return this.encode() == other.encode();
+            DataValue otherDataValue = (DataValue)other;
+            return this.encode() == otherDataValue.encode();
         }
 
-        public override int GetHashCode()
+        /// <summary>
+        /// Gets a hash code for the current object.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
+        public override Int32 GetHashCode()
         {
             return this.encode().GetHashCode();
         }
 
-        public override string ToString()
+        /// <summary>
+        /// Converts the instance to a string.
+        /// </summary>
+        /// <returns>String representation of the instance.</returns>
+        public override String ToString()
         {
             return this.encode().ToString();
         }
@@ -60,7 +86,7 @@ namespace Wikibase.DataValues
         /// <summary>
         /// Get the type of the data value.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Data type identifier.</returns>
         public abstract string getType();
 
         /// <summary>
