@@ -102,7 +102,11 @@ namespace Wikibase
             {
                 query += HttpUtility.UrlEncode(field.Key) + "=" + HttpUtility.UrlEncode(field.Value) + "&";
             }
-            return query.Remove(query.Length - 1);
+            if ( !String.IsNullOrEmpty(query) )
+            {
+                query = query.Remove(query.Length - 1);
+            }
+            return query;
         }
     }
 }
