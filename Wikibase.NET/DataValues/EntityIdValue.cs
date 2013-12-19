@@ -10,12 +10,14 @@ namespace Wikibase.DataValues
     /// </summary>
     public class EntityIdValue : DataValue
     {
+#warning Make properties read-only - changing them will not save to the changes of the claim
 #warning Shouldn't this class simply contain a EntityId, which already encapsulates entityType and numericId
 
         /// <summary>
-        /// The entity type
+        /// Gets or sets the entity type
         /// </summary>
-        /// <remarks>Only q and p are possible values.</remarks>
+        /// <value>The entity type.</value>
+        /// <remarks>Should be "item" in most cases.</remarks>
         public String entityType
         {
             get;
@@ -23,8 +25,9 @@ namespace Wikibase.DataValues
         }
 
         /// <summary>
-        /// The numeric id
+        /// Gets or sets the numeric id.
         /// </summary>
+        /// <value>The numeric id.</value>
         public Int32 numericId
         {
             get;
@@ -42,8 +45,16 @@ namespace Wikibase.DataValues
             this.numericId = numericId;
         }
 
+        /// <summary>
+        /// Creates a new instance by parsing a JsonValue.
+        /// </summary>
+        /// <param name="value">JSonValue to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         internal EntityIdValue(JsonValue value)
         {
+            if ( value == null )
+                throw new ArgumentNullException("value");
+
             JsonObject obj = value.asObject();
             this.entityType = obj.get("entity-type").asString();
             this.numericId = obj.get("numeric-id").asInt();
@@ -58,6 +69,10 @@ namespace Wikibase.DataValues
             return "wikibase-entityid";
         }
 
+        /// <summary>
+        /// Encode the value part of the data value to json.
+        /// </summary>
+        /// <returns>The json value</returns>
         internal override JsonValue encode()
         {
             return new JsonObject()
