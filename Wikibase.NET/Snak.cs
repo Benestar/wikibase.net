@@ -56,9 +56,9 @@ namespace Wikibase
             if ( propertyId == null )
                 throw new ArgumentNullException("propertyId");
 
-            if (propertyId.prefix != "p")
+            if ( propertyId.prefix != "p" )
             {
-                 throw new ArgumentException("propertyId must be a valid property id", "propertyId");
+                throw new ArgumentException("propertyId must be a valid property id", "propertyId");
             }
             this.type = type;
             this.propertyId = propertyId;
@@ -82,7 +82,7 @@ namespace Wikibase
             if ( data == null )
                 throw new ArgumentNullException("data");
 
-            if (data.get("snaktype") == null || data.get("property") == null)
+            if ( data.get("snaktype") == null || data.get("property") == null )
             {
                 throw new ArgumentException("Invalid Snak serialization", "data");
             }
@@ -106,7 +106,7 @@ namespace Wikibase
             JsonObject data = new JsonObject()
                 .add("snaktype", this.type)
                 .add("property", this.propertyId.getPrefixedId());
-            if (this.dataValue != null)
+            if ( this.dataValue != null )
             {
                 data.add("datavalue", this.dataValue.fullEncode());
             }

@@ -46,7 +46,7 @@ namespace Wikibase
                 { "action", "wbgetentities" },
                 { "ids", String.Join("|", ids ) }
             };
-            if(languages != null)
+            if ( languages != null )
             {
                 parameters["languages"] = String.Join("|", languages);
             }
@@ -69,7 +69,7 @@ namespace Wikibase
                 { "sites", String.Join("|", sites ) },
                 { "titles", String.Join("|", titles ) }
             };
-            if (languages != null)
+            if ( languages != null )
             {
                 parameters["languages"] = String.Join("|", languages);
             }
@@ -89,11 +89,11 @@ namespace Wikibase
                 throw new ArgumentNullException("result");
 
             List<Entity> entities = new List<Entity>();
-            if (result.get("entities") != null)
+            if ( result.get("entities") != null )
             {
-                foreach (JsonObject.Member member in result.get("entities").asObject())
+                foreach ( JsonObject.Member member in result.get("entities").asObject() )
                 {
-                    if (member.value.asObject().get("missing") == null)
+                    if ( member.value.asObject().get("missing") == null )
                     {
                         entities.Add(Entity.newFromArray(this, member.value.asObject()));
                     }
@@ -165,7 +165,7 @@ namespace Wikibase
                 { "snaktype", snakType },
                 { "property", property }
             };
-            if (value != null)
+            if ( value != null )
             {
                 parameters["value"] = value.encode().ToString();
             }
@@ -189,7 +189,7 @@ namespace Wikibase
                 { "claim", claim },
                 { "snaktype", snakType }
             };
-            if (value != null)
+            if ( value != null )
             {
                 parameters["value"] = value.encode().ToString();
             }
@@ -230,7 +230,7 @@ namespace Wikibase
                 { "statement", statement },
                 { "snaks", snaks.ToString() }
             };
-            if (reference != null)
+            if ( reference != null )
             {
                 parameters["reference"] = reference;
             }
@@ -273,21 +273,21 @@ namespace Wikibase
                 throw new ArgumentNullException("postFields");
 
             parameters["token"] = this.getEditToken();
-            if (baseRevisionId != 0)
+            if ( baseRevisionId != 0 )
             {
                 parameters["baserevid"] = baseRevisionId.ToString(CultureInfo.InvariantCulture);
             }
-            if (summary != null)
+            if ( summary != null )
             {
                 parameters["summary"] = summary;
             }
-            if (this.botEdits)
+            if ( this.botEdits )
             {
                 parameters["bot"] = true.ToString();
             }
             // limit number of edits
             Int32 time = Environment.TickCount;
-            if (this.lastEditTimestamp > 0 && (time - this.lastEditTimestamp) < this.editLaps)
+            if ( this.lastEditTimestamp > 0 && (time - this.lastEditTimestamp) < this.editLaps )
             {
                 Int32 wait = this.lastEditTimestamp + this.editLaps - time;
                 Console.WriteLine("Wait for {0} seconds...", wait / 1000);

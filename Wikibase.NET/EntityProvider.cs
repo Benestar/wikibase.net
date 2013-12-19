@@ -47,7 +47,7 @@ namespace Wikibase
                 throw new ArgumentNullException("ids");
 
             string[] prefixedIds = new string[ids.Length];
-            for (int i = 0; i < ids.Length; i++)
+            for ( int i = 0 ; i < ids.Length ; i++ )
             {
                 prefixedIds[i] = ids[i].getPrefixedId();
             }
@@ -73,7 +73,7 @@ namespace Wikibase
         public Entity getEntityFromId(EntityId id, string[] languages)
         {
             Entity[] entities = this.getEntitiesFromIds(new EntityId[] { id }, languages);
-            foreach (Entity entity in entities)
+            foreach ( Entity entity in entities )
             {
                 return entity;
             }
@@ -124,7 +124,7 @@ namespace Wikibase
         public Entity getEntityFromSitelink(string site, string title, string[] languages)
         {
             Entity[] entities = this.getEntitiesFromSitelinks(new string[] { site }, new string[] { title }, languages);
-            foreach (Entity entity in entities)
+            foreach ( Entity entity in entities )
             {
                 return entity;
             }

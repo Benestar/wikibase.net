@@ -60,7 +60,7 @@ namespace Wikibase
                 if ( value == null )
                     throw new ArgumentNullException("value");
 
-                if (!this.mMainSnak.propertyId.Equals(value.propertyId))
+                if ( !this.mMainSnak.propertyId.Equals(value.propertyId) )
                 {
                     throw new ArgumentException("Different property id");
                 }
@@ -92,17 +92,17 @@ namespace Wikibase
             if ( data == null )
                 throw new ArgumentNullException("data");
 
-            if (data.get("mainsnak") != null)
+            if ( data.get("mainsnak") != null )
             {
                 this.mMainSnak = Snak.newFromArray(data.get("mainsnak").asObject());
             }
-            if (data.get("id") != null)
+            if ( data.get("id") != null )
             {
                 this.id = data.get("id").asString();
             }
-            if (this.internalId == null)
+            if ( this.internalId == null )
             {
-                if (this.id != null)
+                if ( this.id != null )
                 {
                     this.internalId = this.id;
                 }
@@ -118,9 +118,9 @@ namespace Wikibase
             if ( entity == null )
                 throw new ArgumentNullException("entity");
 
-            if (data.get("type") != null)
+            if ( data.get("type") != null )
             {
-                switch (data.get("type").asString())
+                switch ( data.get("type").asString() )
                 {
                     case "statement":
                         return new Statement(entity, data);
@@ -163,18 +163,18 @@ namespace Wikibase
         /// <param name="summary">Edit summary.</param>
         public void save(String summary)
         {
-            if (!this.changes.isEmpty())
+            if ( !this.changes.isEmpty() )
             {
-                if (this.changes.get("mainsnak") != null)
+                if ( this.changes.get("mainsnak") != null )
                 {
                     JsonObject change = this.changes.get("mainsnak").asObject();
-                    if (change.get("snaktype") == null || change.get("property") == null)
+                    if ( change.get("snaktype") == null || change.get("property") == null )
                     {
                         throw new InvalidOperationException("The main snak does not have required data");
                     }
                     DataValue value = change.get("datavalue") == null ? null : DataValueFactory.newFromArray(change.get("datavalue").asObject().get("value").asObject());
                     JsonObject result;
-                    if (this.id == null)
+                    if ( this.id == null )
                     {
                         result = this.entity.api.createClaim(this.entity.id.getPrefixedId(), change.get("snaktype").asString(), change.get("property").asString(), value, this.entity.lastRevisionId, summary);
                     }
@@ -197,7 +197,7 @@ namespace Wikibase
             if ( result == null )
                 throw new ArgumentNullException("result");
 
-            if (result.get("claim") != null)
+            if ( result.get("claim") != null )
             {
                 this.fillData(result.get("claim").asObject());
             }
@@ -210,7 +210,7 @@ namespace Wikibase
         /// <param name="summary">The edit summary.</param>
         public void deleteAndSave(String summary)
         {
-            if (this.id != null)
+            if ( this.id != null )
             {
                 this.entity.api.removeClaims(new string[] { this.id }, this.entity.lastRevisionId, summary);
             }

@@ -45,13 +45,13 @@ namespace Wikibase
                 throw new ArgumentNullException("data");
 
             base.fillData(data);
-            if (data.get("rank") != null)
+            if ( data.get("rank") != null )
             {
                 this.rank = data.get("rank").asString();
             }
-            if (data.get("references") != null)
+            if ( data.get("references") != null )
             {
-                foreach (JsonValue value in data.get("references").asArray())
+                foreach ( JsonValue value in data.get("references").asArray() )
                 {
                     Reference reference = new Reference(this, value.asObject());
                     this.references.Add(reference.internalId, reference);

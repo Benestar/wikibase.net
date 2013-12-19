@@ -12,7 +12,8 @@ namespace Wikibase
         /// <summary>
         /// Creates a new instance of <see cref="ApiException"/>.
         /// </summary>
-        public ApiException() : base()
+        public ApiException()
+            : base()
         {
         }
 

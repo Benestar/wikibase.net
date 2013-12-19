@@ -75,7 +75,7 @@ namespace Wikibase
         public void setSitelink(string site, string title)
         {
             this.sitelinks[site] = title;
-            if (this.changes.get("sitelinks") == null)
+            if ( this.changes.get("sitelinks") == null )
             {
                 this.changes.set("sitelinks", new JsonObject());
             }
@@ -94,9 +94,9 @@ namespace Wikibase
         /// <returns>If the sitelink was removed successfully</returns>
         public bool removeSitelink(string site)
         {
-            if (sitelinks.Remove(site))
+            if ( sitelinks.Remove(site) )
             {
-                if (this.changes.get("sitelinks") == null)
+                if ( this.changes.get("sitelinks") == null )
                 {
                     this.changes.set("sitelinks", new JsonObject());
                 }
@@ -127,7 +127,7 @@ namespace Wikibase
         /// <returns>The statement</returns>
         public Statement createStatementForSnak(Snak snak)
         {
-            return (Statement) Claim.newFromSnak(this, snak, "statement");
+            return (Statement)Claim.newFromSnak(this, snak, "statement");
         }
     }
 }

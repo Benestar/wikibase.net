@@ -17,7 +17,7 @@ namespace Wikibase.DataValues
 
         internal static DataValue newDataValue(String type, JsonValue value)
         {
-            switch (type)
+            switch ( type )
             {
                 case "wikibase-entityid":
                     return new EntityIdValue(value);

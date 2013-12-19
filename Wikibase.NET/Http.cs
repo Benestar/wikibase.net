@@ -56,12 +56,12 @@ namespace Wikibase
             request.UserAgent = this.UserAgent;
             request.ContentType = "application/x-www-form-urlencoded";
 
-            if (this.cookies.Count == 0)
+            if ( this.cookies.Count == 0 )
                 request.CookieContainer = new CookieContainer();
             else
                 request.CookieContainer = this.cookies;
 
-            if (postFields != null)
+            if ( postFields != null )
             {
                 request.Method = "POST";
                 byte[] postBytes = Encoding.UTF8.GetBytes(this.buildQuery(postFields));
@@ -73,7 +73,7 @@ namespace Wikibase
 
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-            foreach (Cookie cookie in response.Cookies)
+            foreach ( Cookie cookie in response.Cookies )
             {
                 this.cookies.Add(cookie);
             }

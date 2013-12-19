@@ -49,7 +49,7 @@ namespace Wikibase
                 throw new ArgumentNullException("data");
 
             base.fillData(data);
-            if (data.get("datatype") != null)
+            if ( data.get("datatype") != null )
             {
                 this.datatype = data.get("datatype").asString();
             }

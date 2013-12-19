@@ -100,12 +100,12 @@ namespace Wikibase
             String url = this.wiki + "/w/api.php?" + http.buildQuery(parameters);
             String response = http.get(url);
             JsonValue result = JsonValue.readFrom(response);
-            if (!result.isObject())
+            if ( !result.isObject() )
             {
                 return null;
             }
             JsonObject obj = result.asObject();
-            if (obj.get("error") != null)
+            if ( obj.get("error") != null )
             {
                 throw new ApiException(obj.get("error").asObject().get("info").asString());
             }
@@ -130,7 +130,7 @@ namespace Wikibase
             String url = this.wiki + "/w/api.php?" + http.buildQuery(parameters);
             String response = http.post(url, postFields);
             JsonObject result = JsonObject.readFrom(response);
-            if (result.get("error") != null)
+            if ( result.get("error") != null )
             {
                 throw new ApiException(result.get("error").asObject().get("info").asString());
             }
@@ -148,7 +148,7 @@ namespace Wikibase
             if ( result == null )
                 throw new ArgumentNullException("result");
 
-            if (result.get("query-continue") != null)
+            if ( result.get("query-continue") != null )
             {
                 List<String> keys = (List<String>)result.get("query-continue").asObject().names();
                 List<String> keys2 = (List<String>)result.get("query-continue").asObject().get(keys[0]).asObject().names();
@@ -178,12 +178,12 @@ namespace Wikibase
                 { "lgpassword", password }
             };
             JsonObject login = this.post(parameters, postFields).get("login").asObject();
-            if (login.get("result").asString() == "NeedToken")
+            if ( login.get("result").asString() == "NeedToken" )
             {
                 postFields["lgtoken"] = login.get("token").asString();
                 login = this.post(parameters, postFields).get("login").asObject();
             }
-            if (login.get("result").asString() == "Success")
+            if ( login.get("result").asString() == "Success" )
             {
                 this.editToken = null;
                 return true;
@@ -213,7 +213,7 @@ namespace Wikibase
         /// <returns>The edit token.</returns>
         public String getEditToken()
         {
-            if (this.editToken == null)
+            if ( this.editToken == null )
             {
                 Dictionary<String, String> parameters = new Dictionary<String, String>()
                 {
@@ -223,7 +223,7 @@ namespace Wikibase
                     { "titles", "Main Page" }
                 };
                 JsonObject query = this.get(parameters).get("query").asObject();
-                foreach (JsonObject.Member member in query.get("pages").asObject())
+                foreach ( JsonObject.Member member in query.get("pages").asObject() )
                 {
                     return member.value.asObject().get("edittoken").asString();
                 }
