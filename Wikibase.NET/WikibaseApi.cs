@@ -289,7 +289,7 @@ namespace Wikibase
             Int32 time = Environment.TickCount;
             if (this.lastEditTimestamp > 0 && (time - this.lastEditTimestamp) < this.editLaps)
             {
-                int wait = this.lastEditTimestamp + this.editLaps - time;
+                Int32 wait = this.lastEditTimestamp + this.editLaps - time;
                 Console.WriteLine("Wait for {0} seconds...", wait / 1000);
                 Thread.Sleep(wait);
             }

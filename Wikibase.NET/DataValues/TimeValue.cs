@@ -16,7 +16,7 @@ namespace Wikibase.DataValues
         /// </summary>
         public const string GREGORIAN_CALENDAR = "http://www.wikidata.org/entity/Q1985727";
 
-        // TODO: Change to a enum, and keep the numbers only internally
+#warning Change Precision constants to a enum, and keep the numbers only internally
 
         /// <summary>
         /// Gigayear, 1 billion years.

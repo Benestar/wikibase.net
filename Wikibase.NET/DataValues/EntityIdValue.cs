@@ -34,7 +34,7 @@ namespace Wikibase.DataValues
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="entityType">The entity type (p or q).</param>
+        /// <param name="entityType">The entity type ("item").</param>
         /// <param name="numericId">The numeric id.</param>
         public EntityIdValue(String entityType, Int32 numericId)
         {

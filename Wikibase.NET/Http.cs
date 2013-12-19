@@ -8,14 +8,15 @@ using System.Web;
 namespace Wikibase
 {
     /// <summary>
-    /// Http related code
+    /// Http related code.
     /// </summary>
     internal class Http
     {
         /// <summary>
-        /// The user agent
+        /// Gets or sets the user agent.
         /// </summary>
-        public string UserAgent
+        /// <value>The user agent.</value>
+        public String UserAgent
         {
             get;
             set;
@@ -27,7 +28,7 @@ namespace Wikibase
         /// Constructor
         /// </summary>
         /// <param name="userAgent">The user agent</param>
-        public Http(string userAgent)
+        public Http(String userAgent)
         {
             this.UserAgent = userAgent;
         }
@@ -37,7 +38,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="url">The url</param>
         /// <returns>The response</returns>
-        public string get(string url)
+        public String get(String url)
         {
             return this.post(url, null);
         }
@@ -45,10 +46,10 @@ namespace Wikibase
         /// <summary>
         /// Performs a http post request.
         /// </summary>
-        /// <param name="url">The url</param>
-        /// <param name="postFields">The post fields</param>
-        /// <returns>The response</returns>
-        public string post(string url, Dictionary<string, string> postFields)
+        /// <param name="url">The url.</param>
+        /// <param name="postFields">The post fields.</param>
+        /// <returns>The response.</returns>
+        public String post(String url, Dictionary<String, String> postFields)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
@@ -88,15 +89,15 @@ namespace Wikibase
         /// <summary>
         /// Builds a http query string.
         /// </summary>
-        /// <param name="fields">The fields</param>
-        /// <returns>The query string</returns>
+        /// <param name="fields">The fields.</param>
+        /// <returns>The query string.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="fields"/> is <c>null</c>.</exception>
         public String buildQuery(Dictionary<String, String> fields)
         {
             if ( fields == null )
                 throw new ArgumentNullException("fields");
 
-            String query = "";
+            String query = String.Empty;
             foreach ( KeyValuePair<String, String> field in fields )
             {
                 query += HttpUtility.UrlEncode(field.Key) + "=" + HttpUtility.UrlEncode(field.Value) + "&";

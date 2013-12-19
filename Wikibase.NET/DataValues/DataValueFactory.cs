@@ -5,14 +5,17 @@ using MinimalJson;
 
 namespace Wikibase.DataValues
 {
-    static class DataValueFactory
+    /// <summary>
+    /// Factory to create the correct <see cref="DataValue"/> from a <see cref="JsonObject"/>.
+    /// </summary>
+    internal static class DataValueFactory
     {
         internal static DataValue newFromArray(JsonObject data)
         {
             return newDataValue(data.get("type").asString(), data.get("value"));
         }
 
-        internal static DataValue newDataValue(string type, JsonValue value)
+        internal static DataValue newDataValue(String type, JsonValue value)
         {
             switch (type)
             {
