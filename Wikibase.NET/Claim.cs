@@ -118,7 +118,7 @@ namespace Wikibase
                     {
                         throw new Exception("The main snak does not have required data");
                     }
-                    DataValue value = change.get("datavalue") == null ? null : DataValueFactory.newFromArray(change.get("datavalue").asObject().get("value").asObject());
+                    DataValue value = change.get("datavalue") == null ? null : DataValueFactory.newFromArray(change.get("datavalue").asObject());
                     JsonObject result;
                     if (this.id == null)
                     {
