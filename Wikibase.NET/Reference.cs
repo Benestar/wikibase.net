@@ -83,7 +83,7 @@ namespace Wikibase
         public Dictionary<string, Dictionary<string, Snak>> getSnaks()
         {
             Dictionary<string, Dictionary<string, Snak>> copy = new Dictionary<string, Dictionary<string, Snak>>(snaks);
-            foreach (KeyValuePair<string, Dictionary<string, Snak>> pair in copy)
+            foreach (KeyValuePair<string, Dictionary<string, Snak>> pair in snaks)
             {
                 copy[pair.Key] = new Dictionary<string, Snak>(pair.Value);
             }
@@ -97,7 +97,7 @@ namespace Wikibase
         public void addSnak(Snak snak)
         {
             string property = snak.propertyId.getPrefixedId();
-            if (this.snaks[property] == null)
+            if (!this.snaks.ContainsKey(property))
             {
                 this.snaks[property] = new Dictionary<string, Snak>();
             }
@@ -112,7 +112,7 @@ namespace Wikibase
         public bool removeSnak(Snak snak)
         {
             string property = snak.propertyId.getPrefixedId();
-            if (this.snaks[property] == null)
+            if (!this.snaks.ContainsKey(property))
             {
                 return false;
             }
@@ -135,7 +135,7 @@ namespace Wikibase
         {
             if (this.statement.id == null)
             {
-                throw new Exception("The statement has no Id. Please the statement it first.");
+                throw new Exception("The statement has no Id. Please save the statement containing it first.");
             }
             JsonObject obj = new JsonObject();
             foreach (KeyValuePair<string, Dictionary<string, Snak>> pair in this.snaks)
@@ -168,7 +168,7 @@ namespace Wikibase
         {
             if (this.statement.id == null)
             {
-                throw new Exception("The statement has no Id. Please the statement it first.");
+                throw new Exception("The statement has no Id. Please save the statement containing it first.");
             }
             if (this.hash != null)
             {
