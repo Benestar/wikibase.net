@@ -7,27 +7,35 @@ using System.Linq;
 namespace Wikibase
 {
     /// <summary>
-    /// A reference
+    /// A reference.
     /// </summary>
     public class Reference
     {
         /// <summary>
-        /// The statement this reference belongs to
+        /// Gets the statement this reference belongs to.
         /// </summary>
+        /// <value>The statment this reference belongs to.</value>
         public Statement statement { get; private set; }
 
         /// <summary>
-        /// The hash
+        /// Gets the hash.
         /// </summary>
-        public string hash { get; private set; }
+        /// <value>The hash.</value>
+        public String hash { get; private set; }
 
         /// <summary>
-        /// The internal id
+        /// Gets the internal id.
         /// </summary>
-        public string internalId { get; private set; }
+        /// <value>The internal id.</value>
+        public String internalId { get; private set; }
 
-        private Dictionary<string, Dictionary<string, Snak>> snaks = new Dictionary<string, Dictionary<string, Snak>>();
+        private Dictionary<String, Dictionary<String, Snak>> snaks = new Dictionary<String, Dictionary<String, Snak>>();
 
+        /// <summary>
+        /// Creates a new reference by parsing the JSon result.
+        /// </summary>
+        /// <param name="statement">Statement to which the new reference belongs.</param>
+        /// <param name="data">JsonObject to parse.</param>
         internal Reference(Statement statement, JsonObject data)
         {
             this.statement = statement;
@@ -104,12 +112,13 @@ namespace Wikibase
         /// Get all snaks.
         /// </summary>
         /// <returns>The snaks</returns>
-        public Dictionary<string, Dictionary<string, Snak>> getSnaks()
+        /// <remarks>Key is the prefixed property Id, value is a dictionary with <see cref="DataValue.getHash"/> has key and the actual snak as value.</remarks>
+        public Dictionary<String, Dictionary<String, Snak>> getSnaks()
         {
-            Dictionary<string, Dictionary<string, Snak>> copy = new Dictionary<string, Dictionary<string, Snak>>(snaks);
-            foreach (KeyValuePair<string, Dictionary<string, Snak>> pair in copy)
+            Dictionary<String, Dictionary<String, Snak>> copy = new Dictionary<String, Dictionary<String, Snak>>(snaks);
+            foreach (KeyValuePair<String, Dictionary<String, Snak>> pair in snaks)
             {
-                copy[pair.Key] = new Dictionary<string, Snak>(pair.Value);
+                copy[pair.Key] = new Dictionary<String, Snak>(pair.Value);
             }
             return copy;
         }
@@ -124,10 +133,10 @@ namespace Wikibase
             if ( snak == null )
                 throw new ArgumentNullException("snak");
 
-            string property = snak.propertyId.getPrefixedId();
-            if (this.snaks[property] == null)
+            String property = snak.propertyId.getPrefixedId();
+            if (!this.snaks.ContainsKey(property))
             {
-                this.snaks[property] = new Dictionary<string, Snak>();
+                this.snaks[property] = new Dictionary<String, Snak>();
             }
             this.snaks[property][snak.dataValue.getHash()] = snak;
         }
@@ -138,13 +147,13 @@ namespace Wikibase
         /// <param name="snak">The snak.</param>
         /// <returns><c>true</c> if the snak was removed successfully, <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="snak"/> is <c>null</c>.</exception>
-        public bool removeSnak(Snak snak)
+        public Boolean removeSnak(Snak snak)
         {
             if ( snak == null )
                 throw new ArgumentNullException("snak");
 
-            string property = snak.propertyId.getPrefixedId();
-            if (this.snaks[property] == null)
+            String property = snak.propertyId.getPrefixedId();
+            if (!this.snaks.ContainsKey(property))
             {
                 return false;
             }
@@ -163,17 +172,18 @@ namespace Wikibase
         /// Save the reference.
         /// </summary>
         /// <param name="summary">The summary</param>
-        public void save(string summary)
+        /// <exception cref="InvalidOperationException">Statement has no id because not saved yet.</exception>
+        public void save(String summary)
         {
             if (this.statement.id == null)
             {
-                throw new Exception("The statement has no Id. Please the statement it first.");
+                throw new InvalidOperationException("The statement has no Id. Please save the statement containing it first.");
             }
             JsonObject obj = new JsonObject();
-            foreach (KeyValuePair<string, Dictionary<string, Snak>> pair in this.snaks)
+            foreach (KeyValuePair<String, Dictionary<String, Snak>> pair in this.snaks)
             {
                 JsonArray array = new JsonArray();
-                foreach(KeyValuePair<string, Snak> p in pair.Value)
+                foreach(KeyValuePair<String, Snak> p in pair.Value)
                 {
                     array.add(p.Value.toArray());
                 }
@@ -203,15 +213,16 @@ namespace Wikibase
         /// Delete the reference and save the reference which contained it.
         /// </summary>
         /// <param name="summary">The edit summary.</param>
+        /// <exception cref="InvalidOperationException">Statement has no id because not saved yet.</exception>
         public void deleteAndSave(String summary)
         {
             if (this.statement.id == null)
             {
-                throw new InvalidOperationException("The statement has no Id. Please the statement it first.");
+                throw new InvalidOperationException("The statement has no Id. Please save the statement containing it first.");
             }
             if (this.hash != null)
             {
-                this.statement.entity.api.removeReferences(this.statement.id, new string[] { this.hash }, this.statement.entity.lastRevisionId, summary);
+                this.statement.entity.api.removeReferences(this.statement.id, new String[] { this.hash }, this.statement.entity.lastRevisionId, summary);
             }
             this.statement.removeReference(this);
         }
