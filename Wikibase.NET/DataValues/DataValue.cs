@@ -14,19 +14,19 @@ namespace Wikibase.DataValues
         /// <summary>
         /// Get the hash.
         /// </summary>
-        /// <returns>The hash</returns>
-        public string getHash()
+        /// <returns>The hash.</returns>
+        public String getHash()
         {
             return md5(this.encode().ToString());
         }
 
-        private static string md5(string text)
+        private static String md5(string text)
         {
             if ( (text == null) || (text.Length == 0) )
             {
-                return string.Empty;
+                return String.Empty;
             }
-            byte[] result;
+            Byte[] result;
             MD5CryptoServiceProvider md5provider = null;
             try
             {
@@ -87,18 +87,18 @@ namespace Wikibase.DataValues
         /// Get the type of the data value.
         /// </summary>
         /// <returns>Data type identifier.</returns>
-        public abstract string getType();
+        public abstract String getType();
 
         /// <summary>
         /// Encode the value part of the data value to json.
         /// </summary>
-        /// <returns>The json value</returns>
+        /// <returns>The json value.</returns>
         internal abstract JsonValue encode();
 
         /// <summary>
         /// Encode the data value to json.
         /// </summary>
-        /// <returns>The json value</returns>
+        /// <returns>The json value.</returns>
         internal JsonValue fullEncode()
         {
             JsonObject data = new JsonObject()
