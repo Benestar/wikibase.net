@@ -57,19 +57,22 @@ namespace Wikibase
             {
                 this.lastRevisionId = data.get("lastrevid").asInt();
             }
+            JsonValue returnedLabels = data.get("labels");
+            if ( (returnedLabels != null) && (returnedLabels.isObject()) )
             if (data.get("labels") != null)
             {
-                this.labels = new Dictionary<string, string>();
-                foreach (JsonObject.Member member in data.get("labels").asObject())
+                    labels.Clear();
+                    foreach ( JsonObject.Member member in returnedLabels.asObject() )
                 {
                     JsonObject obj = member.value.asObject();
                     this.labels.Add(obj.get("language").asString(), obj.get("value").asString());
                 }
             }
-            if (data.get("descriptions") != null)
+            JsonValue returnedDescriptions = data.get("descriptions");
+            if ( (returnedDescriptions != null) && (returnedDescriptions.isObject()) )
             {
-                this.descriptions = new Dictionary<string, string>();
-                foreach (JsonObject.Member member in data.get("descriptions").asObject())
+                descriptions.Clear();
+                foreach ( JsonObject.Member member in returnedDescriptions.asObject() )
                 {
                     JsonObject obj = member.value.asObject();
                     this.descriptions.Add(obj.get("language").asString(), obj.get("value").asString());
@@ -79,10 +82,10 @@ namespace Wikibase
             if ( (returnedAliases != null) && (returnedAliases.isObject()) )
             {
                 // strange - after save an empty array is returned, whereas by a normal get the fully alias list is returned
-                this.aliases = new Dictionary<string, List<string>>();
+                aliases.Clear();
                 foreach ( JsonObject.Member member in returnedAliases.asObject() )
                 {
-                    List<string> list = new List<string>();
+                    List<String> list = new List<String>();
                     foreach (JsonValue value in member.value.asArray())
                     {
                         list.Add(value.asObject().get("value").asString());
@@ -90,12 +93,13 @@ namespace Wikibase
                     this.aliases.Add(member.name, list);
                 }
             }
-            if (data.get("claims") != null)
+            JsonValue returnedClaims = data.get("claims");
+            if ( (returnedClaims != null) && (returnedClaims.isObject()) )
             {
-                this.claims = new Dictionary<string, Dictionary<string, Claim>>();
-                foreach (JsonObject.Member member in data.get("claims").asObject())
+                claims.Clear();
+                foreach ( JsonObject.Member member in returnedClaims.asObject() )
                 {
-                    Dictionary<string, Claim> list = new Dictionary<string, Claim>();
+                    Dictionary<String, Claim> list = new Dictionary<String, Claim>();
                     foreach (JsonValue value in member.value.asArray())
                     {
                         Claim claim = Claim.newFromArray(this, value.asObject());
