@@ -10,65 +10,73 @@ namespace Wikibase.DataValues
     /// </summary>
     public class GlobeCoordinateValue : DataValue
     {
+        // TODO: Change globe to enum
+        // TODO: Altitude as object?
+
         /// <summary>
         /// Full wikidata entity path for the Earth globe.
         /// </summary>
-        public const string GLOBE_EARTH = "http://www.wikidata.org/entity/Q2";
+        public const String GLOBE_EARTH = "http://www.wikidata.org/entity/Q2";
 
         /// <summary>
-        /// The latitude
+        /// Gets or sets the latitude.
         /// </summary>
-        public double latitude
+        /// <value>The latitude.</value>
+        public Double latitude
         {
             get;
             set;
         }
 
         /// <summary>
-        /// The longitude
+        /// Gets or sets the longitude.
         /// </summary>
-        public double longitude
+        /// <value>The longitude.</value>
+        public Double longitude
         {
             get;
             set;
         }
 
         /// <summary>
-        /// The altitude
+        /// Gets or sets the altitude.
         /// </summary>
-        public object altitude
+        /// <value>The altitude.</value>
+        public Object altitude
         {
             get;
             set;
         }
 
         /// <summary>
-        /// The precision
+        /// Gets or sets the precision.
         /// </summary>
-        public double precision
+        /// <value>The precision.</value>
+        public Double precision
         {
             get;
             set;
         }
 
         /// <summary>
-        /// The globe on which the location resides
+        /// Gets or sets the globe on which the location resides.
         /// </summary>
-        public string globe
+        /// <value>The globe on which the location resides</value>
+        public String globe
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
-        /// <param name="latitude">The latitude</param>
-        /// <param name="longitude">The longitude</param>
-        /// <param name="altitude">The altitude</param>
-        /// <param name="precision">The precision</param>
-        /// <param name="globe">The globe on which the location resides</param>
-        public GlobeCoordinateValue(double latitude, double longitude, object altitude, double precision, string globe)
+        /// <param name="latitude">The latitude.</param>
+        /// <param name="longitude">The longitude.</param>
+        /// <param name="altitude">The altitude.</param>
+        /// <param name="precision">The precision.</param>
+        /// <param name="globe">The globe on which the location resides.</param>
+        public GlobeCoordinateValue(Double latitude, Double longitude, Object altitude, Double precision, String globe)
         {
             this.latitude = latitude;
             this.longitude = longitude;
@@ -95,7 +103,7 @@ namespace Wikibase.DataValues
         /// Gets the type identifier of the type at server side.
         /// </summary>
         /// <returns>The type identifier.</returns>
-        public override string getType()
+        public override String getType()
         {
             return "globecoordinate";
         }
