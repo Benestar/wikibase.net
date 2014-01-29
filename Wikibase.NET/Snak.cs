@@ -49,11 +49,23 @@ namespace Wikibase
             {
                 throw new ArgumentException("Invalid Snak serialization", "data");
             }
-            return new Snak(
-                data.get("snaktype").asString(),
-                EntityId.newFromPrefixedId(data.get("property").asString()),
-                DataValueFactory.newFromArray(data.get("datavalue").asObject())
-            );
+            var dataValue = data.get("datavalue");
+            if ( dataValue != null )
+            {
+                return new Snak(
+                   data.get("snaktype").asString(),
+                   EntityId.newFromPrefixedId(data.get("property").asString()),
+                   DataValueFactory.newFromArray(dataValue.asObject())
+                   );
+            }
+            else
+            {
+                return new Snak(
+                   data.get("snaktype").asString(),
+                   EntityId.newFromPrefixedId(data.get("property").asString()),
+                   null
+                   );
+            }
         }
 
         internal JsonObject toArray()
