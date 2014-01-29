@@ -15,7 +15,7 @@ namespace Wikibase
         /// Gets the type.
         /// </summary>
         /// <value>The type.</value>
-        /// <remarks>Allowed values are "value", "none" and "some". However, only "value" is used.</remarks>
+        /// <remarks>Allowed values are "value", "none" and "somevalue".</remarks>
         public String type
         {
 #warning Snak type prefix better saved as an enum
@@ -88,7 +88,12 @@ namespace Wikibase
             }
             this.type = data.get("snaktype").asString();
             this.propertyId = EntityId.newFromPrefixedId(data.get("property").asString());
+            var readDataValue = data.get("datavalue");
+            // if type!=value, then there is no datavalue in the read data
+            if ( (readDataValue != null) && (readDataValue.isObject()) )
+            {
             this.dataValue = DataValueFactory.newFromArray(data.get("datavalue").asObject());
+            }
         }
 
         internal static Snak newFromArray(JsonObject data)
