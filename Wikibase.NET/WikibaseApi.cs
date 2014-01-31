@@ -167,7 +167,7 @@ namespace Wikibase
             };
             if ( value != null )
             {
-                parameters["value"] = value.encode().ToString();
+                parameters["value"] = value.Encode().ToString();
             }
             return this.editAction(parameters, new Dictionary<String, String>(), baseRevisionId, summary);
         }
@@ -191,7 +191,7 @@ namespace Wikibase
             };
             if ( value != null )
             {
-                parameters["value"] = value.encode().ToString();
+                parameters["value"] = value.Encode().ToString();
             }
             return this.editAction(parameters, new Dictionary<String, String>(), baseRevisionId, summary);
         }

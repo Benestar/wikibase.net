@@ -12,6 +12,8 @@ namespace Wikibase
     /// </summary>
     public class Claim
     {
+        // TODO: Changes of qualifiers
+
         /// <summary>
         /// Gets the entity.
         /// </summary>
@@ -39,6 +41,16 @@ namespace Wikibase
         /// <value>The internally used id.</value>
         /// <remarks>Consists of the property id plus an internal identifier. It is equal to <see cref="id"/> if the claim was parsed from server results.</remarks>
         public String internalId
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the collection of qualifiers assigned to the statement.
+        /// </summary>
+        /// <value>Collection of qualifiers.</value>
+        public ObservableCollection<Qualifier> Qualifiers
         {
             get;
             private set;
@@ -78,6 +90,7 @@ namespace Wikibase
         /// <param name="data">JSon data to be parsed.</param>
         internal Claim(Entity entity, JsonObject data)
         {
+            Qualifiers = new ObservableCollection<Qualifier>();
             this.entity = entity;
             this.fillData(data);
         }
@@ -99,6 +112,20 @@ namespace Wikibase
             if ( data.get("id") != null )
             {
                 this.id = data.get("id").asString();
+            }
+            if ( data.get("qualifiers") != null )
+            {
+                var qualifiers = data.get("qualifiers").asObject();
+
+                foreach ( var entry in qualifiers.names() )
+                {
+                    var json = qualifiers.get(entry).asArray();
+                    foreach ( var value in json )
+                    {
+                        var parsedQualifier = Qualifier.newFromArray(value as JsonObject);
+                        Qualifiers.Add(parsedQualifier);
+                    }
+                }
             }
             if ( this.internalId == null )
             {
@@ -172,11 +199,11 @@ namespace Wikibase
                     {
                         throw new InvalidOperationException("The main snak does not have required data");
                     }
-                    DataValue value = change.get("datavalue") == null ? null : DataValueFactory.newFromArray(change.get("datavalue").asObject());
+                    DataValue value = change.get("datavalue") == null ? null : DataValueFactory.CreateFromJsonObject(change.get("datavalue").asObject());
                     JsonObject result;
                     if ( this.id == null )
                     {
-                        result = this.entity.api.createClaim(this.entity.id.getPrefixedId(), change.get("snaktype").asString(), change.get("property").asString(), value, this.entity.lastRevisionId, summary);
+                        result = this.entity.api.createClaim(this.entity.id.PrefixedId, change.get("snaktype").asString(), change.get("property").asString(), value, this.entity.lastRevisionId, summary);
                     }
                     else
                     {
@@ -215,6 +242,17 @@ namespace Wikibase
                 this.entity.api.removeClaims(new string[] { this.id }, this.entity.lastRevisionId, summary);
             }
             this.entity.removeClaim(this);
+        }
+
+        /// <summary>
+        /// Checks whether the claim is about a given property.
+        /// </summary>
+        /// <param name="value">Property identifier string.</param>
+        /// <returns><c>true</c> if is about the property, <c>false</c> otherwise.</returns>
+        public Boolean IsAboutProperty(String value)
+        {
+            var property = new EntityId(value);
+            return property.Equals(mainSnak.propertyId);
         }
     }
 }

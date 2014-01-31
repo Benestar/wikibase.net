@@ -11,16 +11,30 @@ namespace Wikibase.DataValues
     /// </summary>
     public abstract class DataValue
     {
+        #region Json names
+
+        /// <summary>
+        /// Json name for the datavalue type.
+        /// </summary>
+        public const String ValueTypeJsonName = "type";
+
+        /// <summary>
+        /// Json name for the datavalue content.
+        /// </summary>
+        public const String ValueJsonName = "value";
+
+        #endregion Json names
+
         /// <summary>
         /// Get the hash.
         /// </summary>
         /// <returns>The hash.</returns>
         public String getHash()
         {
-            return md5(this.encode().ToString());
+            return md5(this.Encode().ToString());
         }
 
-        private static String md5(string text)
+        private static String md5(String text)
         {
             if ( (text == null) || (text.Length == 0) )
             {
@@ -47,7 +61,7 @@ namespace Wikibase.DataValues
         ///</summary>
         /// <param name="other">An object to compare with this object.</param>
         /// <returns><c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.</returns>
-        public override Boolean Equals(object other)
+        public override Boolean Equals(Object other)
         {
             if ( this == other )
             {
@@ -62,7 +76,7 @@ namespace Wikibase.DataValues
                 return false;
             }
             DataValue otherDataValue = (DataValue)other;
-            return this.encode() == otherDataValue.encode();
+            return this.Encode() == otherDataValue.Encode();
         }
 
         /// <summary>
@@ -71,7 +85,7 @@ namespace Wikibase.DataValues
         /// <returns>A hash code for the current object.</returns>
         public override Int32 GetHashCode()
         {
-            return this.encode().GetHashCode();
+            return this.Encode().GetHashCode();
         }
 
         /// <summary>
@@ -80,20 +94,20 @@ namespace Wikibase.DataValues
         /// <returns>String representation of the instance.</returns>
         public override String ToString()
         {
-            return this.encode().ToString();
+            return this.Encode().ToString();
         }
 
         /// <summary>
         /// Get the type of the data value.
         /// </summary>
         /// <returns>Data type identifier.</returns>
-        public abstract String getType();
+        protected abstract String JsonName();
 
         /// <summary>
         /// Encode the value part of the data value to json.
         /// </summary>
         /// <returns>The json value.</returns>
-        internal abstract JsonValue encode();
+        internal abstract JsonValue Encode();
 
         /// <summary>
         /// Encode the data value to json.
@@ -102,8 +116,8 @@ namespace Wikibase.DataValues
         internal JsonValue fullEncode()
         {
             JsonObject data = new JsonObject()
-                .add("type", this.getType())
-                .add("value", this.encode());
+                .add(ValueTypeJsonName, this.JsonName())
+                .add(ValueJsonName, this.Encode());
             return data;
         }
     }

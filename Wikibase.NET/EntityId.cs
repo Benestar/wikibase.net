@@ -1,36 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Wikibase
 {
     /// <summary>
+    /// Supported entity types.
+    /// </summary>
+    public enum EntityType
+    {
+        /// <summary>
+        /// Properties, Wikidata URL is https://www.wikidata.org/wiki/Property:P###.
+        /// </summary>
+        Property,
+
+        /// <summary>
+        /// Items, Wikidata URL is https://www.wikidata.org/wiki/Q###.
+        /// </summary>
+        Item
+    }
+
+    /// <summary>
     /// Represents an ID of an Entity.
     /// </summary>
     public class EntityId
     {
-#warning Entity type prefix better saved as an enum
+        private Dictionary<EntityType, String> _entityTypePrefixes = new Dictionary<EntityType, String>
+        {
+            {EntityType.Item, "q"},
+            {EntityType.Property, "p"},
+        };
 
         /// <summary>
         /// The allowed prefixes for entity ids
         /// </summary>
-        public static readonly string[] prefixes = new string[] { "q", "p" };
+        private static readonly String[] prefixes = new String[] { "q", "p" };
 
         /// <summary>
-        /// The prefix
+        /// Gets the entity type.
         /// </summary>
-        public String prefix
+        /// <value>The entity type.</value>
+        public EntityType Type
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// The numeric
+        /// Gets the prefix.
         /// </summary>
-        public Int32 numericId
+        /// <value>The prefix.</value>
+        public String Prefix
+        {
+            get
+            {
+                return _entityTypePrefixes[Type];
+            }
+            private set
+            {
+                SetPrefix(value);
+            }
+        }
+
+        /// <summary>
+        /// Gets the numeric id.
+        /// </summary>
+        /// <value>The numeric id.</value>
+        public Int32 NumericId
         {
             get;
             private set;
@@ -38,50 +77,66 @@ namespace Wikibase
 
         private static Regex prefixedIdRegex = new Regex(@"^(\w)(\d+)(#.*|)$");
 
+        private void SetPrefix(String prefix)
+        {
+            var prefixToFind = prefix.ToLower(CultureInfo.InvariantCulture);
+            if ( !_entityTypePrefixes.Values.Contains(prefixToFind) )
+            {
+                throw new ArgumentException(String.Format("\"{0}\" is no recognized prefix", prefix));
+            }
+            this.Type = _entityTypePrefixes.First(x => x.Value == prefixToFind).Key;
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="prefix">The prefix</param>
         /// <param name="numericId">The numeric id</param>
-        public EntityId(String prefix, int numericId)
+        public EntityId(String prefix, Int32 numericId)
         {
-            this.prefix = prefix;
-            this.numericId = numericId;
+            this.Prefix = prefix;
+            this.NumericId = numericId;
         }
 
         /// <summary>
         /// Constructs an entity id from a prefixed id.
         /// </summary>
-        /// <param name="prefixedId">The prefixed id</param>
-        /// <returns>The entity id</returns>
-        public static EntityId newFromPrefixedId(String prefixedId)
+        /// <param name="prefixedId">The prefixed id.</param>
+        public EntityId(String prefixedId)
         {
-#warning ToDo - convert to a a constructor
+            Boolean success = false;
             if ( !String.IsNullOrWhiteSpace(prefixedId) )
             {
                 Match match = prefixedIdRegex.Match(prefixedId.ToLower(CultureInfo.InvariantCulture));
                 if ( match.Success )
                 {
-                    if ( Array.Exists(prefixes, delegate(string s)
+                    if ( Array.Exists(prefixes, delegate(String s)
                 {
                     return s == match.Groups[1].Value;
                 }) )
                     {
-                        return new EntityId(match.Groups[1].Value, int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture));
+                        this.NumericId = Int32.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
+                        this.Prefix = match.Groups[1].Value;
+                        success = true;
                     }
                 }
             }
-            return null;
+            if ( !success )
+            {
+                throw new ArgumentException(String.Format("\"{0}\" is not a parseable prefixed id", prefixedId));
+            }
         }
 
         /// <summary>
-        /// Returns the prefixed id of the entity id.
+        /// Gets the prefixed id of the entity id.
         /// </summary>
-        /// <returns>The prefixed id</returns>
-        public string getPrefixedId()
+        /// <value>The prefixed id.</value>
+        public String PrefixedId
         {
-            // Duplicate with ToString()
-            return prefix + numericId;
+            get
+            {
+                return Prefix + NumericId;
+            }
         }
 
         /// <summary>
@@ -105,7 +160,7 @@ namespace Wikibase
                 return false;
             }
             EntityId otherId = (EntityId)other;
-            return prefix == otherId.prefix && numericId == otherId.numericId;
+            return Type == otherId.Type && NumericId == otherId.NumericId;
         }
 
         /// <summary>
@@ -114,7 +169,7 @@ namespace Wikibase
         /// <returns>A hash code for the current object.</returns>
         public override Int32 GetHashCode()
         {
-            return (prefix.GetHashCode() * 3) ^ (numericId.GetHashCode() * 7);
+            return (Type.GetHashCode() * 3) ^ (NumericId.GetHashCode() * 7);
         }
 
         /// <summary>
@@ -123,7 +178,7 @@ namespace Wikibase
         /// <returns>Entity Id as a string.</returns>
         public override String ToString()
         {
-            return prefix + numericId;
+            return PrefixedId;
         }
     }
 }

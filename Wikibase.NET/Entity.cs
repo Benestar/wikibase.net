@@ -95,7 +95,7 @@ namespace Wikibase
 
             if ( data.get("id") != null )
             {
-                this.id = EntityId.newFromPrefixedId(data.get("id").asString());
+                this.id = new EntityId(data.get("id").asString());
             }
             if ( data.get("lastrevid") != null )
             {
@@ -103,15 +103,15 @@ namespace Wikibase
             }
             JsonValue returnedLabels = data.get("labels");
             if ( (returnedLabels != null) && (returnedLabels.isObject()) )
-            if ( data.get("labels") != null )
-            {
+                if ( data.get("labels") != null )
+                {
                     labels.Clear();
                     foreach ( JsonObject.Member member in returnedLabels.asObject() )
-                {
-                    JsonObject obj = member.value.asObject();
-                    this.labels.Add(obj.get("language").asString(), obj.get("value").asString());
+                    {
+                        JsonObject obj = member.value.asObject();
+                        this.labels.Add(obj.get("language").asString(), obj.get("value").asString());
+                    }
                 }
-            }
             JsonValue returnedDescriptions = data.get("descriptions");
             if ( (returnedDescriptions != null) && (returnedDescriptions.isObject()) )
             {
@@ -477,7 +477,7 @@ namespace Wikibase
         /// <param name="claim">The claim.</param>
         internal void addClaim(Claim claim)
         {
-            string property = claim.mainSnak.propertyId.getPrefixedId();
+            string property = claim.mainSnak.propertyId.PrefixedId;
             if ( !this.claims.ContainsKey(property) )
             {
                 this.claims[property] = new Dictionary<string, Claim>();
@@ -492,7 +492,7 @@ namespace Wikibase
         /// <returns><c>true</c> if the claim was removed successfully, <c>false</c> otherwise.</returns>
         internal Boolean removeClaim(Claim claim)
         {
-            string property = claim.mainSnak.propertyId.getPrefixedId();
+            string property = claim.mainSnak.propertyId.PrefixedId;
             if ( !this.claims.ContainsKey(property) )
             {
                 return false;
@@ -523,7 +523,7 @@ namespace Wikibase
                 }
                 else
                 {
-                    result = this.api.editEntity(this.id.getPrefixedId(), this.changes, this.lastRevisionId, summary);
+                    result = this.api.editEntity(this.id.PrefixedId, this.changes, this.lastRevisionId, summary);
                 }
                 if ( result.get("entity") != null )
                 {

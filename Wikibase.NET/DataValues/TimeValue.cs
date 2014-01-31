@@ -1,103 +1,199 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using MinimalJson;
 
 namespace Wikibase.DataValues
 {
     /// <summary>
-    /// Data value for times
+    /// The precision for a <see cref="TimeValue"/>.
     /// </summary>
-    public class TimeValue : DataValue
+    public enum TimeValuePrecision
     {
-        /// <summary>
-        /// Full wikidata entity path for the (proleptic) Gregorian calendar.
-        /// </summary>
-        public const string GREGORIAN_CALENDAR = "http://www.wikidata.org/entity/Q1985727";
-
-#warning Change Precision constants to a enum, and keep the numbers only internally
-
         /// <summary>
         /// Gigayear, 1 billion years.
         /// </summary>
-        public const int PRECISION_Ga = 0; // Gigayear
+        GigaYear = 0,
 
         /// <summary>
         /// 100 megayears, 100 million years.
         /// </summary>
-        public const int PRECISION_100Ma = 1; // 100 Megayears
+        HundredMegaYears = 1,
 
         /// <summary>
         /// 10 megayears, 10 million years.
         /// </summary>
-        public const int PRECISION_10Ma = 2; // 10 Megayears
+        TenMegaYears = 2,
 
         /// <summary>
         /// 1 megayear, 1 million years.
         /// </summary>
-        public const int PRECISION_Ma = 3; // Megayear
+        MegaYear = 3,
 
         /// <summary>
         /// 100 kiloyears, 100,000 years.
         /// </summary>
-        public const int PRECISION_100ka = 4; // 100 Kiloyears
+        HundredKiloYears = 4,
 
         /// <summary>
         /// 10 kiloyears, 10,000 years.
         /// </summary>
-        public const int PRECISION_10ka = 5; // 10 Kiloyears
+        TenKiloYears = 5,
 
         /// <summary>
         /// 1 kiloyear, 1,000 years or one millenium.
         /// </summary>
-        public const int PRECISION_ka = 6; // Kiloyear
+        Millenium = 6,
 
         /// <summary>
         /// 100 years or one century.
         /// </summary>
-        public const int PRECISION_100a = 7; // 100 years
+        Century = 7,
 
         /// <summary>
         /// 10 years or one decade.
         /// </summary>
-        public const int PRECISION_10a = 8; // 10 years
+        Decade = 8,
 
         /// <summary>
         /// 1 year.
         /// </summary>
-        public const int PRECISION_YEAR = 9;
+        Year = 9,
 
         /// <summary>
         /// 1 month.
         /// </summary>
-        public const int PRECISION_MONTH = 10;
+        Month = 10,
 
         /// <summary>
         /// 1 day.
         /// </summary>
-        public const int PRECISION_DAY = 11;
+        Day = 11,
 
         /// <summary>
         /// 1 hour.
         /// </summary>
-        public const int PRECISION_HOUR = 12;
+        Hour = 12,
 
         /// <summary>
         /// 1 minute.
         /// </summary>
-        public const int PRECISION_MINUTE = 13;
+        Minute = 13,
 
         /// <summary>
         /// 1 second.
         /// </summary>
-        public const int PRECISION_SECOND = 14;
+        Second = 14,
+    }
+
+    /// <summary>
+    /// The calendar models supported by WikiData.
+    /// </summary>
+    public enum CalendarModel
+    {
+        /// <summary>
+        /// Undefined calendar model.
+        /// </summary>
+        Unknown,
+
+        /// <summary>
+        /// Gregorian calendar, proleptic if necessary.
+        /// </summary>
+        GregorianCalendar,
+
+        /// <summary>
+        /// Julian Calendar.
+        /// </summary>
+        JulianCalendar
+    }
+
+    /// <summary>
+    /// Data value for times
+    /// </summary>
+    public class TimeValue : DataValue
+    {
+        #region Json names
+
+        /// <summary>
+        /// The identifier of this data type in the serialized json object.
+        /// </summary>
+        public const String TypeJsonName = "time";
+
+        /// <summary>
+        /// The name of the <see cref="DisplayCalendarModel"/> property in the serialized json object.
+        /// </summary>
+        private const String CalendarModelJsonName = "calendarmodel";
+
+        /// <summary>
+        /// The name of the <see cref="FullValue"/> property in the serialized json object.
+        /// </summary>
+        private const String TimeJsonName = "time";
+
+        /// <summary>
+        /// The name of the <see cref="TimeZoneOffset"/> property in the serialized json object.
+        /// </summary>
+        private const String TimeZoneJsonName = "timezone";
+
+        /// <summary>
+        /// The name of the <see cref="Before"/> property in the serialized json object.
+        /// </summary>
+        private const String BeforeJsonName = "before";
+
+        /// <summary>
+        /// The name of the <see cref="After"/> property in the serialized json object.
+        /// </summary>
+        private const String AfterJsonName = "after";
+
+        /// <summary>
+        /// The name of the <see cref="Precision"/> property in the serialized json object.
+        /// </summary>
+        private const String PrecisionJsonName = "precision";
+
+        #endregion Json names
+
+        #region private fields
+
+        private Dictionary<CalendarModel, String> _calendarModelIdentifiers = new Dictionary<CalendarModel, String>()
+        {
+             {CalendarModel.GregorianCalendar, "http://www.wikidata.org/entity/Q1985727" },
+             {CalendarModel.JulianCalendar, "http://www.wikidata.org/entity/Q1985786"}
+        };
+
+        #endregion private fields
+
+        #region properties
+
+        /// <summary>
+        /// Gets or sets the date and time.
+        /// </summary>
+        /// <value>The date and time.</value>
+        public DateTime DateTime
+        {
+            get
+            {
+                return GetDateTimeValue();
+            }
+            set
+            {
+                FullValue = value.ToString("+0000000YYYY-NN-DDTHH:MM:SSZ", CultureInfo.InvariantCulture);
+            }
+        }
+
+        private DateTime GetDateTimeValue()
+        {
+            if ( !FullValue.StartsWith("+0000000", StringComparison.Ordinal) )
+                throw new InvalidOperationException("Time value out of range");
+
+            return DateTime.Parse(FullValue.Substring(8), CultureInfo.InvariantCulture);
+        }
 
         /// <summary>
         /// Point in time, represented per ISO8601
         /// The year always having 11 digits, the date always be signed, in the format +00000002013-01-01T00:00:00Z
         /// </summary>
-        public String time
+        public String FullValue
         {
             get;
             set;
@@ -106,7 +202,7 @@ namespace Wikibase.DataValues
         /// <summary>
         /// Timezone information as an offset from UTC in minutes.
         /// </summary>
-        public Int32 timezone
+        public Int32 TimeZoneOffset
         {
             get;
             set;
@@ -114,9 +210,9 @@ namespace Wikibase.DataValues
 
         /// <summary>
         /// If the date is uncertain, how many units before the given time could it be?
-        /// The unit is given by the <see cref="precision"/>.
+        /// The unit is given by the <see cref="Precision"/>.
         /// </summary>
-        public Int32 before
+        public Int32 Before
         {
             get;
             set;
@@ -124,50 +220,56 @@ namespace Wikibase.DataValues
 
         /// <summary>
         /// If the date is uncertain, how many units after the given time could it be?
-        /// The unit is given by the <see cref="precision"/>.
+        /// The unit is given by the <see cref="Precision"/>.
         /// </summary>
-        public Int32 after
+        public Int32 After
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Unit used for the <see cref="after"/> and <see cref="before"/> values.
+        /// Unit used for the <see cref="After"/> and <see cref="Before"/> values.
         /// </summary>
-        public Int32 precision
+        public TimeValuePrecision Precision
         {
             get;
             set;
         }
 
         /// <summary>
-        /// URI identifying the calendar model that should be used to display this time value.
+        /// Calendar model that should be used to display this time value.
+        /// </summary>
+        /// <remarks>
         /// Note that time is always saved in proleptic Gregorian, this URI states how the value should be displayed.
-        /// </summary>
-        public String calendarmodel
+        /// </remarks>
+        public CalendarModel DisplayCalendarModel
         {
             get;
             set;
         }
+
+        #endregion properties
+
+        #region constructor
 
         /// <summary>
         /// Creates a new time value with the given settings.
         /// </summary>
-        /// <param name="time">Time value in ISO8601 format.</param>
-        /// <param name="timezone">Time zone offset in minutes.</param>
+        /// <param name="time">Time value in ISO8601 format (with 11 year digits).</param>
+        /// <param name="timeZoneOffset">Time zone offset in minutes.</param>
         /// <param name="before">Number of <paramref name="precision">units</paramref> the actual time value could be before the given time value.</param>
         /// <param name="after">Number of <paramref name="precision">units</paramref> the actual time value could be after the given time value.</param>
         /// <param name="precision">Date/time precision.</param>
-        /// <param name="calendarmodel">Calendar model property.</param>
-        public TimeValue(String time, int timezone, int before, int after, int precision, String calendarmodel)
+        /// <param name="calendarModel">Calendar model property.</param>
+        public TimeValue(String time, Int32 timeZoneOffset, Int32 before, Int32 after, TimeValuePrecision precision, CalendarModel calendarModel)
         {
-            this.time = time;
-            this.timezone = timezone;
-            this.before = before;
-            this.after = after;
-            this.precision = precision;
-            this.calendarmodel = calendarmodel;
+            this.FullValue = time;
+            this.TimeZoneOffset = timeZoneOffset;
+            this.Before = before;
+            this.After = after;
+            this.Precision = precision;
+            this.DisplayCalendarModel = calendarModel;
         }
 
         /// <summary>
@@ -181,36 +283,56 @@ namespace Wikibase.DataValues
                 throw new ArgumentNullException("value");
 
             JsonObject obj = value.asObject();
-            this.time = obj.get("time").asString();
-            this.timezone = obj.get("timezone").asInt();
-            this.before = obj.get("before").asInt();
-            this.after = obj.get("after").asInt();
-            this.precision = obj.get("precision").asInt();
-            this.calendarmodel = obj.get("calendarmodel").asString();
+            this.FullValue = obj.get(TimeJsonName).asString();
+            this.TimeZoneOffset = obj.get(TimeZoneJsonName).asInt();
+            this.Before = obj.get(BeforeJsonName).asInt();
+            this.After = obj.get(AfterJsonName).asInt();
+            this.Precision = (TimeValuePrecision)obj.get(PrecisionJsonName).asInt();
+            var calendar = obj.get(CalendarModelJsonName).asString();
+            if ( _calendarModelIdentifiers.Any(x => x.Value == calendar) )
+            {
+                this.DisplayCalendarModel = _calendarModelIdentifiers.First(x => x.Value == calendar).Key;
+            }
+            else
+            {
+                this.DisplayCalendarModel = CalendarModel.Unknown;
+            }
         }
+
+        #endregion constructor
+
+        #region methods
 
         /// <summary>
         /// Encodes as a <see cref="JsonValue"/>.
         /// </summary>
         /// <returns>Encoded class.</returns>
-        internal override JsonValue encode()
+        /// <exception cref="InvalidOperationException"><see cref="DisplayCalendarModel"/> is <see cref="CalendarModel.Unknown"/>.</exception>
+        internal override JsonValue Encode()
         {
+            if ( DisplayCalendarModel == CalendarModel.Unknown )
+            {
+                throw new InvalidOperationException("Calendar model value not set.");
+            }
+
             return new JsonObject()
-                .add("time", time)
-                .add("timezone", timezone)
-                .add("before", before)
-                .add("after", after)
-                .add("precision", precision)
-                .add("calendarmodel", calendarmodel);
+                .add(TimeJsonName, FullValue)
+                .add(TimeZoneJsonName, TimeZoneOffset)
+                .add(BeforeJsonName, Before)
+                .add(AfterJsonName, After)
+                .add(PrecisionJsonName, Convert.ToInt32(Precision))
+                .add(CalendarModelJsonName, _calendarModelIdentifiers[DisplayCalendarModel]);
         }
 
         /// <summary>
         /// Gets the data type identifier.
         /// </summary>
         /// <returns></returns>
-        public override string getType()
+        protected override string JsonName()
         {
-            return "time";
+            return TypeJsonName;
         }
+
+        #endregion methods
     }
 }

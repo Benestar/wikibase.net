@@ -10,11 +10,20 @@ namespace Wikibase.DataValues
     /// </summary>
     public class StringValue : DataValue
     {
+        #region Json names
+
+        /// <summary>
+        /// The identifier of this data type in the serialized json object.
+        /// </summary>
+        public const String TypeJsonName = "string";
+
+        #endregion Json names
+
         /// <summary>
         /// Gets or sets the string value.
         /// </summary>
         /// <value>The string value.</value>
-        public String str
+        public String Value
         {
             get;
             set;
@@ -26,7 +35,7 @@ namespace Wikibase.DataValues
         /// <param name="value">Value to be added.</param>
         public StringValue(String value)
         {
-            this.str = value;
+            this.Value = value;
         }
 
         /// <summary>
@@ -39,25 +48,25 @@ namespace Wikibase.DataValues
             if ( value == null )
                 throw new ArgumentNullException("value");
 
-            this.str = value.asString();
+            this.Value = value.asString();
         }
 
         /// <summary>
         /// Gets the data type identifier.
         /// </summary>
         /// <returns>Data type identifier.</returns>
-        public override String getType()
+        protected override String JsonName()
         {
-            return "string";
+            return TypeJsonName;
         }
 
         /// <summary>
         /// Encodes the instance in a <see cref="JsonValue"/>.
         /// </summary>
         /// <returns>Encoded instance.</returns>
-        internal override JsonValue encode()
+        internal override JsonValue Encode()
         {
-            return JsonValue.valueOf(str);
+            return JsonValue.valueOf(Value);
         }
     }
 }

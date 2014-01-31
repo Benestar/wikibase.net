@@ -10,23 +10,25 @@ namespace Wikibase.DataValues
     /// </summary>
     internal static class DataValueFactory
     {
-        internal static DataValue newFromArray(JsonObject data)
+        internal static DataValue CreateFromJsonObject(JsonObject data)
         {
-            return newDataValue(data.get("type").asString(), data.get("value"));
+            return CreateFromJsonValue(data.get(DataValue.ValueTypeJsonName).asString(), data.get(DataValue.ValueJsonName));
         }
 
-        internal static DataValue newDataValue(String type, JsonValue value)
+        internal static DataValue CreateFromJsonValue(String type, JsonValue value)
         {
             switch ( type )
             {
-                case "wikibase-entityid":
+                case EntityIdValue.TypeJsonName:
                     return new EntityIdValue(value);
-                case "string":
+                case StringValue.TypeJsonName:
                     return new StringValue(value);
-                case "time":
+                case TimeValue.TypeJsonName:
                     return new TimeValue(value);
-                case "globecoordinate":
+                case GlobeCoordinateValue.TypeJsonName:
                     return new GlobeCoordinateValue(value);
+                case QuantityValue.TypeJsonName:
+                    return new QuantityValue(value);
                 default:
                     throw new NotSupportedException("Unsupported type " + type);
             }

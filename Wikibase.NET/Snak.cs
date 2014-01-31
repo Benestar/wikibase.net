@@ -50,13 +50,13 @@ namespace Wikibase
         /// <param name="propertyId">The property id</param>
         /// <param name="dataValue">The data value</param>
         /// <exception cref="ArgumentNullException"><paramref name="propertyId"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="propertyId"/> has a <see cref="EntityId.prefix"/> which is not the property prefix.</exception>
+        /// <exception cref="ArgumentException"><paramref name="propertyId"/> has a <see cref="EntityId.Prefix"/> which is not the property prefix.</exception>
         public Snak(String type, EntityId propertyId, DataValue dataValue)
         {
             if ( propertyId == null )
                 throw new ArgumentNullException("propertyId");
 
-            if ( propertyId.prefix != "p" )
+            if ( propertyId.Prefix != "p" )
             {
                 throw new ArgumentException("propertyId must be a valid property id", "propertyId");
             }
@@ -87,12 +87,12 @@ namespace Wikibase
                 throw new ArgumentException("Invalid Snak serialization", "data");
             }
             this.type = data.get("snaktype").asString();
-            this.propertyId = EntityId.newFromPrefixedId(data.get("property").asString());
+            this.propertyId = new EntityId(data.get("property").asString());
             var readDataValue = data.get("datavalue");
             // if type!=value, then there is no datavalue in the read data
             if ( (readDataValue != null) && (readDataValue.isObject()) )
             {
-            this.dataValue = DataValueFactory.newFromArray(data.get("datavalue").asObject());
+                this.dataValue = DataValueFactory.CreateFromJsonObject(data.get("datavalue").asObject());
             }
         }
 
@@ -110,7 +110,7 @@ namespace Wikibase
         {
             JsonObject data = new JsonObject()
                 .add("snaktype", this.type)
-                .add("property", this.propertyId.getPrefixedId());
+                .add("property", this.propertyId.PrefixedId);
             if ( this.dataValue != null )
             {
                 data.add("datavalue", this.dataValue.fullEncode());

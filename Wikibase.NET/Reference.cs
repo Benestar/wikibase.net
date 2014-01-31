@@ -112,7 +112,7 @@ namespace Wikibase
         /// Get all snaks.
         /// </summary>
         /// <returns>The snaks</returns>
-        /// <remarks>Key is the prefixed property Id, value is a dictionary with <see cref="DataValue.getHash"/> has key and the actual snak as value.</remarks>
+        /// <remarks>Key is the prefixed property Id, value is a dictionary with <see cref="Wikibase.DataValues.DataValue.getHash"/> as key and the actual snak as value.</remarks>
         public Dictionary<String, Dictionary<String, Snak>> getSnaks()
         {
             Dictionary<String, Dictionary<String, Snak>> copy = new Dictionary<String, Dictionary<String, Snak>>(snaks);
@@ -133,7 +133,7 @@ namespace Wikibase
             if ( snak == null )
                 throw new ArgumentNullException("snak");
 
-            String property = snak.propertyId.getPrefixedId();
+            String property = snak.propertyId.PrefixedId;
             if (!this.snaks.ContainsKey(property))
             {
                 this.snaks[property] = new Dictionary<String, Snak>();
@@ -152,7 +152,7 @@ namespace Wikibase
             if ( snak == null )
                 throw new ArgumentNullException("snak");
 
-            String property = snak.propertyId.getPrefixedId();
+            String property = snak.propertyId.PrefixedId;
             if (!this.snaks.ContainsKey(property))
             {
                 return false;

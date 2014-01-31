@@ -49,7 +49,7 @@ namespace Wikibase
             string[] prefixedIds = new string[ids.Length];
             for ( int i = 0 ; i < ids.Length ; i++ )
             {
-                prefixedIds[i] = ids[i].getPrefixedId();
+                prefixedIds[i] = ids[i].PrefixedId;
             }
             return this.api.getEntitiesFromIds(prefixedIds, languages);
         }
