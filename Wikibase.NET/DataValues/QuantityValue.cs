@@ -1,15 +1,34 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using MinimalJson;
 
 namespace Wikibase.DataValues
 {
     /// <summary>
+    /// Possible unit values for the <see cref="QuantityValue.Unit"/>.
+    /// </summary>
+    public enum QuantityUnit
+    {
+        /// <summary>
+        /// Undefined value.
+        /// </summary>
+        Unknown = 0,
+
+        /// <summary>
+        /// Number without a dimension.
+        /// </summary>
+        DimensionLess = 1,
+    }
+
+    /// <summary>
     /// Encapsulates the quantity value type.
     /// </summary>
     public class QuantityValue : DataValue
     {
+        #region Jscon names
+
         /// <summary>
         /// The identifier of this data type in the serialized json object.
         /// </summary>
@@ -35,6 +54,8 @@ namespace Wikibase.DataValues
         /// </summary>
         private const String UnitJsonName = "unit";
 
+        #endregion Jscon names
+
         // TODO: Better data structures, string is too general
 
         /// <summary>
@@ -48,10 +69,10 @@ namespace Wikibase.DataValues
         }
 
         /// <summary>
-        /// Gets or sets the string value.
+        /// Gets or sets the unit of measurement.
         /// </summary>
-        /// <value>The string value.</value>
-        public String Unit
+        /// <value>The unit of measurement.</value>
+        public QuantityUnit Unit
         {
             get;
             set;
@@ -78,6 +99,22 @@ namespace Wikibase.DataValues
         }
 
         /// <summary>
+        /// Creates a new quantity value for a exact integer value.
+        /// </summary>
+        /// <param name="value">Integer value.</param>
+        public QuantityValue(Int64 value)
+        {
+            Amount = value.ToString(CultureInfo.InvariantCulture);
+            if ( value > 0 )
+            {
+                Amount = "+" + Amount;
+            }
+            UpperBound = Amount;
+            LowerBound = Amount;
+            Unit = QuantityUnit.DimensionLess;
+        }
+
+        /// <summary>
         /// Parses a <see cref="JsonValue"/> to a <see cref="QuantityValue"/>
         /// </summary>
         /// <param name="value"><see cref="JsonValue"/> to be parsed.</param>
@@ -89,7 +126,7 @@ namespace Wikibase.DataValues
 
             JsonObject obj = value.asObject();
             this.Amount = obj.get(AmountJsonName).asString();
-            this.Unit = obj.get(UnitJsonName).asString();
+            this.Unit = (QuantityUnit)Convert.ToInt32(obj.get(UnitJsonName).asString());
             this.UpperBound = obj.get(UpperBoundJsonName).asString();
             this.LowerBound = obj.get(LowerBoundJsonName).asString();
         }
@@ -111,7 +148,7 @@ namespace Wikibase.DataValues
         {
             return new JsonObject()
                 .add(AmountJsonName, Amount)
-                .add(UnitJsonName, Unit)
+                .add(UnitJsonName, Convert.ToInt32(Unit).ToString(CultureInfo.InvariantCulture))
                 .add(UpperBoundJsonName, UpperBound)
                 .add(LowerBoundJsonName, LowerBound);
         }
