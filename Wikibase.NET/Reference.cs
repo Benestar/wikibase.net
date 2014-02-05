@@ -59,8 +59,8 @@ namespace Wikibase
                     Dictionary<string, Snak> list = new Dictionary<string, Snak>();
                     foreach (JsonValue value in member.value.asArray())
                     {
-                        Snak snak = Snak.newFromArray(value.asObject());
-                        list.Add(snak.dataValue.getHash(), snak);
+                        Snak snak = new Snak(value.asObject());
+                        list.Add(snak.DataValue.getHash(), snak);
                     }
                     this.snaks.Add(member.name, list);
                 }
@@ -133,12 +133,12 @@ namespace Wikibase
             if ( snak == null )
                 throw new ArgumentNullException("snak");
 
-            String property = snak.propertyId.PrefixedId;
+            String property = snak.PropertyId.PrefixedId;
             if (!this.snaks.ContainsKey(property))
             {
                 this.snaks[property] = new Dictionary<String, Snak>();
             }
-            this.snaks[property][snak.dataValue.getHash()] = snak;
+            this.snaks[property][snak.DataValue.getHash()] = snak;
         }
 
         /// <summary>
@@ -152,12 +152,12 @@ namespace Wikibase
             if ( snak == null )
                 throw new ArgumentNullException("snak");
 
-            String property = snak.propertyId.PrefixedId;
+            String property = snak.PropertyId.PrefixedId;
             if (!this.snaks.ContainsKey(property))
             {
                 return false;
             }
-            if (this.snaks[property].Remove(snak.dataValue.getHash()))
+            if (this.snaks[property].Remove(snak.DataValue.getHash()))
             {
                 if (this.snaks[property].Count == 0)
                 {
@@ -185,7 +185,7 @@ namespace Wikibase
                 JsonArray array = new JsonArray();
                 foreach(KeyValuePair<String, Snak> p in pair.Value)
                 {
-                    array.add(p.Value.toArray());
+                    array.add(p.Value.Encode());
                 }
                 obj.add(pair.Key, array);
             }

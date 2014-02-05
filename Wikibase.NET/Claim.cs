@@ -72,12 +72,12 @@ namespace Wikibase
                 if ( value == null )
                     throw new ArgumentNullException("value");
 
-                if ( !this.mMainSnak.propertyId.Equals(value.propertyId) )
+                if ( !this.mMainSnak.PropertyId.Equals(value.PropertyId) )
                 {
                     throw new ArgumentException("Different property id");
                 }
                 this.mMainSnak = value;
-                this.changes.set("mainsnak", value.toArray());
+                this.changes.set("mainsnak", value.Encode());
             }
         }
 
@@ -107,7 +107,7 @@ namespace Wikibase
 
             if ( data.get("mainsnak") != null )
             {
-                this.mMainSnak = Snak.newFromArray(data.get("mainsnak").asObject());
+                this.mMainSnak = new Snak(data.get("mainsnak").asObject());
             }
             if ( data.get("id") != null )
             {
@@ -135,7 +135,7 @@ namespace Wikibase
                 }
                 else
                 {
-                    this.internalId = "" + Environment.TickCount + this.mMainSnak.propertyId + this.mMainSnak.dataValue;
+                    this.internalId = "" + Environment.TickCount + this.mMainSnak.PropertyId + this.mMainSnak.DataValue;
                 }
             }
         }
@@ -175,11 +175,11 @@ namespace Wikibase
             Claim claim = newFromArray(
                 entity,
                 new JsonObject()
-                    .add("mainsnak", snak.toArray())
+                    .add("mainsnak", snak.Encode())
                     .add("type", type)
             );
             claim.changes = new JsonObject()
-                .add("mainsnak", snak.toArray());
+                .add("mainsnak", snak.Encode());
             entity.addClaim(claim);
             return claim;
         }
@@ -252,7 +252,7 @@ namespace Wikibase
         public Boolean IsAboutProperty(String value)
         {
             var property = new EntityId(value);
-            return property.Equals(mainSnak.propertyId);
+            return property.Equals(mainSnak.PropertyId);
         }
     }
 }

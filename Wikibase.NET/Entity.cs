@@ -477,7 +477,7 @@ namespace Wikibase
         /// <param name="claim">The claim.</param>
         internal void addClaim(Claim claim)
         {
-            string property = claim.mainSnak.propertyId.PrefixedId;
+            string property = claim.mainSnak.PropertyId.PrefixedId;
             if ( !this.claims.ContainsKey(property) )
             {
                 this.claims[property] = new Dictionary<string, Claim>();
@@ -492,7 +492,7 @@ namespace Wikibase
         /// <returns><c>true</c> if the claim was removed successfully, <c>false</c> otherwise.</returns>
         internal Boolean removeClaim(Claim claim)
         {
-            string property = claim.mainSnak.propertyId.PrefixedId;
+            string property = claim.mainSnak.PropertyId.PrefixedId;
             if ( !this.claims.ContainsKey(property) )
             {
                 return false;

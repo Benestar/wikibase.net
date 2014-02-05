@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MinimalJson;
 using Wikibase.DataValues;
@@ -7,18 +8,63 @@ using Wikibase.DataValues;
 namespace Wikibase
 {
     /// <summary>
+    /// Possible type of snaks, see <see cref="Snak.Type"/>.
+    /// </summary>
+    public enum SnakType
+    {
+        /// <summary>
+        /// Snak containing a <see cref="DataValue"/>.
+        /// </summary>
+        Value,
+
+        /// <summary>
+        /// No value.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Snak should have a value, but it is unknown.
+        /// </summary>
+        SomeValue
+    }
+
+    /// <summary>
     /// A snak, a property with its value.
     /// </summary>
     public class Snak
     {
+        #region Json names
+
+        /// <summary>
+        /// The name of the <see cref="Type"/> property in the serialized json object.
+        /// </summary>
+        private const String SnakTypeJsonName = "snaktype";
+
+        /// <summary>
+        /// The name of the <see cref="PropertyId"/> property in the serialized json object.
+        /// </summary>
+        private const String PropertyJsonName = "property";
+
+        /// <summary>
+        /// The name of the <see cref="DataValue"/> property in the serialized json object.
+        /// </summary>
+        private const String DataValueJsonName = "datavalue";
+
+        private Dictionary<SnakType, String> _snakTypeIdentifiers = new Dictionary<SnakType, String>()
+        {
+            {SnakType.None,"none"},
+            {SnakType.SomeValue,"somevalue"},
+            {SnakType.Value,"value"},
+        };
+
+        #endregion Json names
+
         /// <summary>
         /// Gets the type.
         /// </summary>
         /// <value>The type.</value>
-        /// <remarks>Allowed values are "value", "none" and "somevalue".</remarks>
-        public String type
+        public SnakType Type
         {
-#warning Snak type prefix better saved as an enum
             get;
             private set;
         }
@@ -27,7 +73,7 @@ namespace Wikibase
         /// Gets the property id.
         /// </summary>
         /// <value>The property id.</value>
-        public EntityId propertyId
+        public EntityId PropertyId
         {
             get;
             private set;
@@ -37,7 +83,7 @@ namespace Wikibase
         /// Gets the data value.
         /// </summary>
         /// <value>The data value.</value>
-        public DataValue dataValue
+        public DataValue DataValue
         {
             get;
             private set;
@@ -51,7 +97,7 @@ namespace Wikibase
         /// <param name="dataValue">The data value</param>
         /// <exception cref="ArgumentNullException"><paramref name="propertyId"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="propertyId"/> has a <see cref="EntityId.Prefix"/> which is not the property prefix.</exception>
-        public Snak(String type, EntityId propertyId, DataValue dataValue)
+        public Snak(SnakType type, EntityId propertyId, DataValue dataValue)
         {
             if ( propertyId == null )
                 throw new ArgumentNullException("propertyId");
@@ -60,9 +106,20 @@ namespace Wikibase
             {
                 throw new ArgumentException("propertyId must be a valid property id", "propertyId");
             }
-            this.type = type;
-            this.propertyId = propertyId;
-            this.dataValue = dataValue;
+            this.Type = type;
+            this.PropertyId = propertyId;
+            this.DataValue = dataValue;
+        }
+
+        /// <summary>
+        /// Creates a new snak from the json object.
+        /// </summary>
+        /// <param name="data">Json object to parse.</param>
+        internal Snak(JsonObject data)
+        {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+            FillFromArray(data);
         }
 
         /// <summary>
@@ -77,43 +134,46 @@ namespace Wikibase
         /// </summary>
         /// <param name="data">JSon array to parse.</param>
         /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-        protected virtual void fillFromArray(JsonObject data)
+        protected virtual void FillFromArray(JsonObject data)
         {
             if ( data == null )
                 throw new ArgumentNullException("data");
 
-            if ( data.get("snaktype") == null || data.get("property") == null )
+            if ( data.get(SnakTypeJsonName) == null || data.get(PropertyJsonName) == null )
             {
                 throw new ArgumentException("Invalid Snak serialization", "data");
             }
-            this.type = data.get("snaktype").asString();
-            this.propertyId = new EntityId(data.get("property").asString());
-            var readDataValue = data.get("datavalue");
+            var type = data.get(SnakTypeJsonName).asString();
+            if ( _snakTypeIdentifiers.Any(x => x.Value == type) )
+            {
+                this.Type = _snakTypeIdentifiers.First(x => x.Value == type).Key;
+            }
+            else
+            {
+                throw new ArgumentException("JsonObject contained unknown snaktype");
+            }
+
+            this.PropertyId = new EntityId(data.get(PropertyJsonName).asString());
+            var readDataValue = data.get(DataValueJsonName);
             // if type!=value, then there is no datavalue in the read data
             if ( (readDataValue != null) && (readDataValue.isObject()) )
             {
-                this.dataValue = DataValueFactory.CreateFromJsonObject(data.get("datavalue").asObject());
+                this.DataValue = DataValueFactory.CreateFromJsonObject(data.get(DataValueJsonName).asObject());
             }
         }
 
-        internal static Snak newFromArray(JsonObject data)
-        {
-            if ( data == null )
-                throw new ArgumentNullException("data");
-
-            var result = new Snak();
-            result.fillFromArray(data);
-            return result;
-        }
-
-        internal JsonObject toArray()
+        /// <summary>
+        /// Encodes as a <see cref="JsonObject"/>.
+        /// </summary>
+        /// <returns>Encoded class.</returns>
+        internal JsonObject Encode()
         {
             JsonObject data = new JsonObject()
-                .add("snaktype", this.type)
-                .add("property", this.propertyId.PrefixedId);
-            if ( this.dataValue != null )
+                .add(SnakTypeJsonName, _snakTypeIdentifiers[this.Type])
+                .add(PropertyJsonName, this.PropertyId.PrefixedId);
+            if ( this.DataValue != null )
             {
-                data.add("datavalue", this.dataValue.fullEncode());
+                data.add(DataValueJsonName, this.DataValue.fullEncode());
             }
             return data;
         }

@@ -18,7 +18,7 @@ namespace Wikibase
         /// <param name="type">The type</param>
         /// <param name="propertyId">The property id</param>
         /// <param name="dataValue">The data value</param>
-        public Qualifier(string type, EntityId propertyId, DataValue dataValue)
+        public Qualifier(SnakType type, EntityId propertyId, DataValue dataValue)
             : base(type, propertyId, dataValue)
         {
         }
@@ -43,7 +43,7 @@ namespace Wikibase
                 throw new ArgumentNullException("data");
 
             var result = new Qualifier();
-            result.fillFromArray(data);
+            result.FillFromArray(data);
             return result;
         }
     }
