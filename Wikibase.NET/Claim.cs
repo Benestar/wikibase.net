@@ -92,7 +92,7 @@ namespace Wikibase
         {
             Qualifiers = new ObservableCollection<Qualifier>();
             this.entity = entity;
-            this.fillData(data);
+            this.FillData(data);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="data"><see cref="JsonObject"/> to parse.</param>
         /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-        protected virtual void fillData(JsonObject data)
+        protected virtual void FillData(JsonObject data)
         {
             if ( data == null )
                 throw new ArgumentNullException("data");
@@ -122,7 +122,7 @@ namespace Wikibase
                     var json = qualifiers.get(entry).asArray();
                     foreach ( var value in json )
                     {
-                        var parsedQualifier = Qualifier.newFromArray(value as JsonObject);
+                        var parsedQualifier = new Qualifier(value as JsonObject);
                         Qualifiers.Add(parsedQualifier);
                     }
                 }
@@ -226,7 +226,7 @@ namespace Wikibase
 
             if ( result.get("claim") != null )
             {
-                this.fillData(result.get("claim").asObject());
+                this.FillData(result.get("claim").asObject());
             }
             this.entity.updateLastRevisionIdFromResult(result);
         }

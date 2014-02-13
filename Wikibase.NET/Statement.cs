@@ -1,28 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MinimalJson;
 
 namespace Wikibase
 {
     /// <summary>
+    /// Ranks of statements.
+    /// </summary>
+    public enum Rank
+    {
+        /// <summary>
+        /// Rank not defined.
+        /// </summary>
+        Unknown,
+
+        /// <summary>
+        /// Preferred statement.
+        /// </summary>
+        Preferred,
+
+        /// <summary>
+        /// Normal statement.
+        /// </summary>
+        Normal,
+
+        /// <summary>
+        /// Deprecated statement.
+        /// </summary>
+        Deprecated,
+    }
+
+    /// <summary>
     /// A statement.
     /// </summary>
     public class Statement : Claim
     {
+        #region Jscon names
+
         /// <summary>
-        /// The rank of the statement
+        /// The name of the <see cref="References"/> property in the serialized json object.
         /// </summary>
-        public string rank
+        private const String ReferencesJsonName = "references";
+
+        /// <summary>
+        /// The name of the <see cref="Rank"/> property in the serialized json object.
+        /// </summary>
+        private const String RankJsonName = "rank";
+
+        private static Dictionary<Rank, String> _rankJsonNames = new Dictionary<Rank, String>()
+        {
+             {Rank.Preferred, "preferred" },
+             {Rank.Normal, "normal" },
+             {Rank.Deprecated, "deprecated" }
+        };
+
+        #endregion Jscon names
+
+        /// <summary>
+        /// Gets the rank of the statement.
+        /// </summary>
+        /// <value>The rank of the statement.</value>
+        public Rank Rank
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Internal dictionary, storing the references by its <see cref="Reference.internalId"/>.
+        /// Internal dictionary, storing the references by its <see cref="Reference.InternalId"/>.
         /// </summary>
-        private Dictionary<string, Reference> references = new Dictionary<string, Reference>();
+        private Dictionary<String, Reference> references = new Dictionary<String, Reference>();
 
         /// <summary>
         /// Creates a new instance.
@@ -39,35 +88,32 @@ namespace Wikibase
         /// </summary>
         /// <param name="data"><see cref="JsonObject"/> to parse.</param>
         /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-        protected override void fillData(JsonObject data)
+        protected override void FillData(JsonObject data)
         {
             if ( data == null )
                 throw new ArgumentNullException("data");
 
-            base.fillData(data);
-            if ( data.get("rank") != null )
+            base.FillData(data);
+            if ( data.get(RankJsonName) != null )
             {
-                this.rank = data.get("rank").asString();
-            }
-            if ( data.get("references") != null )
-            {
-                foreach ( JsonValue value in data.get("references").asArray() )
+                var rank = data.get(RankJsonName).asString();
+                if ( _rankJsonNames.Any(x => x.Value == rank) )
                 {
-                    Reference reference = new Reference(this, value.asObject());
-                    this.references.Add(reference.internalId, reference);
+                    this.Rank = _rankJsonNames.First(x => x.Value == rank).Key;
+                }
+                else
+                {
+                    this.Rank = Rank.Unknown;
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets all references.
-        /// </summary>
-        /// <returns>The references.</returns>
-        [ObsoleteAttribute("Use References instead", false)]
-        public Dictionary<string, Reference> getReferences()
-        {
-#warning Why create a new dictionary? The data values are not cloned. Besides, the key is inside the value already, so the References property below is the correct approach.
-            return new Dictionary<string, Reference>(references);
+            if ( data.get(ReferencesJsonName) != null )
+            {
+                foreach ( JsonValue value in data.get(ReferencesJsonName).asArray() )
+                {
+                    Reference reference = new Reference(this, value.asObject());
+                    this.references.Add(reference.InternalId, reference);
+                }
+            }
         }
 
         /// <summary>
@@ -87,12 +133,12 @@ namespace Wikibase
         /// </summary>
         /// <param name="reference">The reference to add.</param>
         /// <exception cref="ArgumentNullException"><paramref name="reference"/> is <c>null</c>.</exception>
-        public void addReference(Reference reference)
+        public void AddReference(Reference reference)
         {
             if ( reference == null )
                 throw new ArgumentNullException("reference");
 
-            this.references[reference.internalId] = reference;
+            this.references[reference.InternalId] = reference;
         }
 
         /// <summary>
@@ -101,12 +147,12 @@ namespace Wikibase
         /// <param name="reference">The reference to be removed.</param>
         /// <returns><c>true</c> if the reference was removed successfully, <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="reference"/> is <c>null</c>.</exception>
-        public bool removeReference(Reference reference)
+        public Boolean RemoveReference(Reference reference)
         {
             if ( reference == null )
                 throw new ArgumentNullException("reference");
 
-            return this.references.Remove(reference.internalId);
+            return this.references.Remove(reference.InternalId);
         }
 
         /// <summary>
@@ -115,12 +161,12 @@ namespace Wikibase
         /// <param name="snak">The snak which makes up the reference.</param>
         /// <returns>The newly created reference.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="snak"/> is <c>null</c>.</exception>
-        public Reference createReferenceForSnak(Snak snak)
+        public Reference CreateReferenceForSnak(Snak snak)
         {
             if ( snak == null )
                 throw new ArgumentNullException("snak");
 
-            return Reference.newFromSnaks(this, new Snak[] { snak });
+            return new Reference(this, new Snak[] { snak });
         }
     }
 }

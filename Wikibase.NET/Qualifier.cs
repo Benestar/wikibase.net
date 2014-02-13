@@ -35,16 +35,13 @@ namespace Wikibase
         /// Creates a <see cref="Qualifier"/> from a <see cref="JsonObject"/>.
         /// </summary>
         /// <param name="data">JSonObject to be parsed.</param>
-        /// <returns>Newly created qualifier.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-        new internal static Qualifier newFromArray(JsonObject data)
+        internal Qualifier(JsonObject data)
         {
             if ( data == null )
                 throw new ArgumentNullException("data");
 
-            var result = new Qualifier();
-            result.FillFromArray(data);
-            return result;
+            this.FillFromArray(data);
         }
     }
 }

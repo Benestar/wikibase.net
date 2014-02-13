@@ -61,13 +61,10 @@ namespace Wikibase.DataValues
 
         #endregion Json names
 
-        private Dictionary<Globe, String> _globeJsonNames = new Dictionary<Globe, String>()
+        private static Dictionary<Globe, String> _globeJsonNames = new Dictionary<Globe, String>()
         {
              {Globe.Earth, "http://www.wikidata.org/entity/Q2" }
         };
-
-        // TODO: Change globe to enum
-        // TODO: Altitude as object?
 
         /// <summary>
         /// Gets or sets the latitude.

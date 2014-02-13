@@ -155,7 +155,7 @@ namespace Wikibase.DataValues
 
         #region private fields
 
-        private Dictionary<CalendarModel, String> _calendarModelIdentifiers = new Dictionary<CalendarModel, String>()
+        private static Dictionary<CalendarModel, String> _calendarModelIdentifiers = new Dictionary<CalendarModel, String>()
         {
              {CalendarModel.GregorianCalendar, "http://www.wikidata.org/entity/Q1985727" },
              {CalendarModel.JulianCalendar, "http://www.wikidata.org/entity/Q1985786"}

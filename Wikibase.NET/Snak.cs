@@ -50,7 +50,7 @@ namespace Wikibase
         /// </summary>
         private const String DataValueJsonName = "datavalue";
 
-        private Dictionary<SnakType, String> _snakTypeIdentifiers = new Dictionary<SnakType, String>()
+        private static Dictionary<SnakType, String> _snakTypeIdentifiers = new Dictionary<SnakType, String>()
         {
             {SnakType.None,"none"},
             {SnakType.SomeValue,"somevalue"},
@@ -92,17 +92,17 @@ namespace Wikibase
         /// <summary>
         /// Creates a new <see cref="Snak"/> with the given values.
         /// </summary>
-        /// <param name="type">The type</param>
-        /// <param name="propertyId">The property id</param>
-        /// <param name="dataValue">The data value</param>
+        /// <param name="type">The snak type.</param>
+        /// <param name="propertyId">The property id.</param>
+        /// <param name="dataValue">The data value.</param>
         /// <exception cref="ArgumentNullException"><paramref name="propertyId"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="propertyId"/> has a <see cref="EntityId.Prefix"/> which is not the property prefix.</exception>
+        /// <exception cref="ArgumentException"><paramref name="propertyId"/> has <see cref="EntityId.Type"/> not set as <see cref="EntityType.Property"/>.</exception>
         public Snak(SnakType type, EntityId propertyId, DataValue dataValue)
         {
             if ( propertyId == null )
                 throw new ArgumentNullException("propertyId");
 
-            if ( propertyId.Prefix != "p" )
+            if ( propertyId.Type != EntityType.Property )
             {
                 throw new ArgumentException("propertyId must be a valid property id", "propertyId");
             }

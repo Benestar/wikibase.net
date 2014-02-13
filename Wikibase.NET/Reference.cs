@@ -15,19 +15,19 @@ namespace Wikibase
         /// Gets the statement this reference belongs to.
         /// </summary>
         /// <value>The statment this reference belongs to.</value>
-        public Statement statement { get; private set; }
+        public Statement Statement { get; private set; }
 
         /// <summary>
         /// Gets the hash.
         /// </summary>
         /// <value>The hash.</value>
-        public String hash { get; private set; }
+        public String Hash { get; private set; }
 
         /// <summary>
         /// Gets the internal id.
         /// </summary>
         /// <value>The internal id.</value>
-        public String internalId { get; private set; }
+        public String InternalId { get; private set; }
 
         private Dictionary<String, Dictionary<String, Snak>> snaks = new Dictionary<String, Dictionary<String, Snak>>();
 
@@ -38,8 +38,8 @@ namespace Wikibase
         /// <param name="data">JsonObject to parse.</param>
         internal Reference(Statement statement, JsonObject data)
         {
-            this.statement = statement;
-            this.fillData(data);
+            this.Statement = statement;
+            this.FillData(data);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="data"><see cref="JsonObject"/> to parse.</param>
         /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-        protected void fillData(JsonObject data)
+        protected void FillData(JsonObject data)
         {
             if ( data == null )
                 throw new ArgumentNullException("data");
@@ -67,17 +67,17 @@ namespace Wikibase
             }
             if (data.get("hash") != null)
             {
-                this.hash = data.get("hash").asString();
+                this.Hash = data.get("hash").asString();
             }
-            if (this.internalId == null)
+            if (this.InternalId == null)
             {
-                if (this.hash != null)
+                if (this.Hash != null)
                 {
-                    this.internalId = this.hash;
+                    this.InternalId = this.Hash;
                 }
                 else
                 {
-                    this.internalId = "" + Environment.TickCount + this.statement.internalId;
+                    this.InternalId = "" + Environment.TickCount + this.Statement.internalId;
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace Wikibase
         /// <returns>New reference instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="statement"/> or <paramref name="snaks"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="snaks"/> is empty.</exception>
-        public static Reference newFromSnaks(Statement statement, Snak[] snaks)
+        public Reference(Statement statement, Snak[] snaks)
         {
             if ( snaks == null )
                 throw new ArgumentNullException("snaks");
@@ -99,13 +99,12 @@ namespace Wikibase
             if ( !snaks.Any())
                 throw new ArgumentException("snaks");
 
-            Reference reference = new Reference(statement, new JsonObject());
+            this.Statement = statement;
             foreach (Snak snak in snaks)
             {
-                reference.addSnak(snak);
+                AddSnak(snak);
             }
-            statement.addReference(reference);
-            return reference;
+            statement.AddReference(this);
         }
 
         /// <summary>
@@ -128,7 +127,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="snak">The snak.</param>
         /// <exception cref="ArgumentNullException"><paramref name="snak"/> is <c>null</c>.</exception>
-        public void addSnak(Snak snak)
+        public void AddSnak(Snak snak)
         {
             if ( snak == null )
                 throw new ArgumentNullException("snak");
@@ -147,7 +146,7 @@ namespace Wikibase
         /// <param name="snak">The snak.</param>
         /// <returns><c>true</c> if the snak was removed successfully, <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="snak"/> is <c>null</c>.</exception>
-        public Boolean removeSnak(Snak snak)
+        public Boolean RemoveSnak(Snak snak)
         {
             if ( snak == null )
                 throw new ArgumentNullException("snak");
@@ -173,9 +172,9 @@ namespace Wikibase
         /// </summary>
         /// <param name="summary">The summary</param>
         /// <exception cref="InvalidOperationException">Statement has no id because not saved yet.</exception>
-        public void save(String summary)
+        public void Save(String summary)
         {
-            if (this.statement.id == null)
+            if (this.Statement.id == null)
             {
                 throw new InvalidOperationException("The statement has no Id. Please save the statement containing it first.");
             }
@@ -189,24 +188,24 @@ namespace Wikibase
                 }
                 obj.add(pair.Key, array);
             }
-            JsonObject result = this.statement.entity.api.setReference(this.statement.id, obj, this.hash, this.statement.entity.lastRevisionId, summary);
-            this.updateDataFromResult(result);
+            JsonObject result = this.Statement.entity.api.setReference(this.Statement.id, obj, this.Hash, this.Statement.entity.lastRevisionId, summary);
+            this.UpdateDataFromResult(result);
         }
 
         /// <summary>
         /// Updates instance from API call result.
         /// </summary>
         /// <param name="result">Json result.</param>
-        protected void updateDataFromResult(JsonObject result)
+        protected void UpdateDataFromResult(JsonObject result)
         {
             if ( result == null )
                 throw new ArgumentNullException("result");
 
             if (result.get("reference") != null)
             {
-                this.fillData(result.get("reference").asObject());
+                this.FillData(result.get("reference").asObject());
             }
-            this.statement.entity.updateLastRevisionIdFromResult(result);
+            this.Statement.entity.updateLastRevisionIdFromResult(result);
         }
 
         /// <summary>
@@ -214,17 +213,17 @@ namespace Wikibase
         /// </summary>
         /// <param name="summary">The edit summary.</param>
         /// <exception cref="InvalidOperationException">Statement has no id because not saved yet.</exception>
-        public void deleteAndSave(String summary)
+        public void DeleteAndSave(String summary)
         {
-            if (this.statement.id == null)
+            if (this.Statement.id == null)
             {
                 throw new InvalidOperationException("The statement has no Id. Please save the statement containing it first.");
             }
-            if (this.hash != null)
+            if (this.Hash != null)
             {
-                this.statement.entity.api.removeReferences(this.statement.id, new String[] { this.hash }, this.statement.entity.lastRevisionId, summary);
+                this.Statement.entity.api.removeReferences(this.Statement.id, new String[] { this.Hash }, this.Statement.entity.lastRevisionId, summary);
             }
-            this.statement.removeReference(this);
+            this.Statement.RemoveReference(this);
         }
     }
 }
