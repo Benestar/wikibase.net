@@ -273,6 +273,26 @@ namespace Wikibase.DataValues
         }
 
         /// <summary>
+        /// Creates a new time value with the given settings.
+        /// </summary>
+        /// <param name="time">Time value in ISO8601 format (with 11 year digits).</param>
+        /// <param name="timeZoneOffset">Time zone offset in minutes.</param>
+        /// <param name="before">Number of <paramref name="precision">units</paramref> the actual time value could be before the given time value.</param>
+        /// <param name="after">Number of <paramref name="precision">units</paramref> the actual time value could be after the given time value.</param>
+        /// <param name="precision">Date/time precision.</param>
+        /// <param name="calendarModel">Calendar model property.</param>
+        public static TimeValue DateValue(DateTime time)
+        {
+            return new TimeValue(
+                time.ToString("+0000000YYYY-NN-DDTHH:MM:SSZ", CultureInfo.InvariantCulture),
+                0,  // timezoneoffset
+                0,  // before
+                0,  // after
+                TimeValuePrecision.Day,
+                CalendarModel.GregorianCalendar);
+        }
+
+        /// <summary>
         /// Parses a <see cref="JsonValue"/> to a time value.
         /// </summary>
         /// <param name="value"><see cref="JsonValue"/> to parse.</param>

@@ -90,7 +90,7 @@ namespace Wikibase
         /// <returns>New reference instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="statement"/> or <paramref name="snaks"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="snaks"/> is empty.</exception>
-        public Reference(Statement statement, Snak[] snaks)
+        public Reference(Statement statement, IEnumerable<Snak> snaks)
         {
             if ( snaks == null )
                 throw new ArgumentNullException("snaks");
@@ -105,6 +105,7 @@ namespace Wikibase
                 AddSnak(snak);
             }
             statement.AddReference(this);
+            this.InternalId = "" + Environment.TickCount + this.Statement.internalId;
         }
 
         /// <summary>
