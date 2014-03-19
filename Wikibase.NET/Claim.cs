@@ -122,7 +122,7 @@ namespace Wikibase
                     var json = qualifiers.get(entry).asArray();
                     foreach ( var value in json )
                     {
-                        var parsedQualifier = new Qualifier(value as JsonObject);
+                        var parsedQualifier = new Qualifier(this,value as JsonObject);
                         Qualifiers.Add(parsedQualifier);
                     }
                 }

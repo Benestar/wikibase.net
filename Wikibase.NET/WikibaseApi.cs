@@ -257,6 +257,50 @@ namespace Wikibase
         }
 
         /// <summary>
+        /// Set a qualifier.
+        /// </summary>
+        /// <param name="statement">GUID identifying the statement</param>
+        /// <param name="snak">The snak to set the reference to. Array with property ids pointing to arrays containing the snaks for that property</param>
+        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
+        /// <param name="summary">The summary for the change</param>
+        /// <returns>The result</returns>
+        internal JsonObject setQualifier(String statement, String snakType, String property, DataValue value, Int32 baseRevisionId, String summary)
+        {
+            Dictionary<String, String> parameters = new Dictionary<String, String>()
+            {
+                { "action", "wbsetqualifier" },
+                { "claim", statement },
+                { "snaktype", snakType },
+                { "property", property }
+            };
+            if (value != null)
+            {
+                parameters["value"] = value.Encode().ToString();
+            }
+
+            return this.editAction(parameters, new Dictionary<String, String>(), baseRevisionId, summary);
+        }
+
+        /// <summary>
+        /// Remove the qualifiers.
+        /// </summary>
+        /// <param name="statement">GUID identifying the statement</param>
+        /// <param name="references">The hashes of the qualifiers that should be removed</param>
+        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
+        /// <param name="summary">The summary for the change</param>
+        /// <returns>The result</returns>
+        internal JsonObject removeQualifier(String statement, String[] references, Int32 baseRevisionId, String summary)
+        {
+            Dictionary<string, string> parameters = new Dictionary<String, String>()
+            {
+                { "action", "wbremovequalifiers" },
+                { "statement", statement },
+                { "qualifiers", string.Join("|", references) }
+            };
+            return this.editAction(parameters, new Dictionary<String, String>(), baseRevisionId, summary);
+        }
+
+        /// <summary>
         /// Perform an edit action.
         /// </summary>
         /// <param name="parameters">The parameters.</param>

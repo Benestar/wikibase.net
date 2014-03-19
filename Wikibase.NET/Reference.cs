@@ -14,7 +14,7 @@ namespace Wikibase
         /// <summary>
         /// Gets the statement this reference belongs to.
         /// </summary>
-        /// <value>The statment this reference belongs to.</value>
+        /// <value>The statement this reference belongs to.</value>
         public Statement Statement { get; private set; }
 
         /// <summary>
