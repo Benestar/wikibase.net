@@ -177,7 +177,7 @@ namespace Wikibase.DataValues
             }
             set
             {
-                FullValue = value.ToString("+0000000YYYY-NN-DDTHH:MM:SSZ", CultureInfo.InvariantCulture);
+                FullValue = value.ToString("+0000000yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
             }
         }
 
@@ -279,7 +279,7 @@ namespace Wikibase.DataValues
         public static TimeValue DateValue(DateTime time)
         {
             return new TimeValue(
-                time.ToString("+0000000YYYY-NN-DDTHH:MM:SSZ", CultureInfo.InvariantCulture),
+                time.ToString("+0000000yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
                 0,  // timezoneoffset
                 0,  // before
                 0,  // after

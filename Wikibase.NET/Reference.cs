@@ -104,8 +104,8 @@ namespace Wikibase
             {
                 AddSnak(snak);
             }
+            this.InternalId = Environment.TickCount + this.Statement.internalId;
             statement.AddReference(this);
-            this.InternalId = "" + Environment.TickCount + this.Statement.internalId;
         }
 
         /// <summary>

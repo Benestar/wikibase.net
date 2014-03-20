@@ -89,6 +89,41 @@ namespace Wikibase
                 throw new InvalidOperationException("The statement has no Id. Please save the statement containing it first.");
             }
             JsonObject result = this.Statement.entity.api.setQualifier(this.Statement.id, _snakTypeIdentifiers[this.Type], this.PropertyId.PrefixedId,DataValue, this.Statement.entity.lastRevisionId, summary);
+            this.UpdateDataFromResult(result);
         }
+
+        /// <summary>
+        /// Updates instance from API call result.
+        /// </summary>
+        /// <param name="result">Json result.</param>
+        protected void UpdateDataFromResult(JsonObject result)
+        {
+            if (result == null)
+                throw new ArgumentNullException("result");
+
+            // result is a complete claim
+            if (result.get("claim") != null)
+            {
+                var claim = result.get("claim").asObject();
+                if (claim.get("qualifiers") != null)
+                {
+                    var qualifiers = claim.get("qualifiers").asObject();
+                    foreach (var entry in qualifiers.names())
+                    {
+                        if (new EntityId(entry).Equals(PropertyId))
+                        {
+                            var json = qualifiers.get(entry).asArray();
+                            foreach (var value in json)
+                            {
+                                FillFromArray(value as JsonObject);
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.Statement.entity.updateLastRevisionIdFromResult(result);
+        }
+
     }
 }

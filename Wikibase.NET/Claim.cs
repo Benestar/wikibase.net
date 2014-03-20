@@ -46,6 +46,7 @@ namespace Wikibase
             private set;
         }
 
+        // Change to a dictionary with property ID as key?
         /// <summary>
         /// Gets the collection of qualifiers assigned to the statement.
         /// </summary>
