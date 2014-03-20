@@ -273,14 +273,9 @@ namespace Wikibase.DataValues
         }
 
         /// <summary>
-        /// Creates a new time value with the given settings.
+        /// Creates a new time value for the give <paramref name="time"/> using the <see cref="TimeValuePrecision.Day"/>.
         /// </summary>
-        /// <param name="time">Time value in ISO8601 format (with 11 year digits).</param>
-        /// <param name="timeZoneOffset">Time zone offset in minutes.</param>
-        /// <param name="before">Number of <paramref name="precision">units</paramref> the actual time value could be before the given time value.</param>
-        /// <param name="after">Number of <paramref name="precision">units</paramref> the actual time value could be after the given time value.</param>
-        /// <param name="precision">Date/time precision.</param>
-        /// <param name="calendarModel">Calendar model property.</param>
+        /// <param name="time">Date value.</param>
         public static TimeValue DateValue(DateTime time)
         {
             return new TimeValue(

@@ -109,7 +109,7 @@ namespace Wikibase
         /// <param name="data">The serialized data of the entity</param>
         /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
         /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
+        /// <returns>The returned json object from the server.</returns>
         internal JsonObject editEntity(String id, JsonObject data, Int32 baseRevisionId, String summary)
         {
             Dictionary<String, String> parameters = new Dictionary<String, String>()
@@ -131,7 +131,7 @@ namespace Wikibase
         /// <param name="data">The serialized data of the entity</param>
         /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
         /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
+        /// <returns>The returned json object from the server.</returns>
         internal JsonObject createEntity(String type, JsonObject data, Int32 baseRevisionId, String summary)
         {
             Dictionary<String, String> parameters = new Dictionary<String, String>()
@@ -149,13 +149,13 @@ namespace Wikibase
         /// <summary>
         /// Create a claim.
         /// </summary>
-        /// <param name="entity">The id of the entity you are adding the claim to</param>
-        /// <param name="snakType">The type of the snak</param>
-        /// <param name="property">The id of the snak property</param>
-        /// <param name="value">The value of the snak when creating a claim with a snak that has a value</param>
-        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
-        /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
+        /// <param name="entity">The id of the entity you are adding the claim to.</param>
+        /// <param name="snakType">The type of the snak.</param>
+        /// <param name="property">The id of the snak property.</param>
+        /// <param name="value">The value of the snak when creating a claim with a snak that has a value.</param>
+        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on.</param>
+        /// <param name="summary">The summary for the change.</param>
+        /// <returns>The returned json object from the server.</returns>
         internal JsonObject createClaim(String entity, String snakType, String property, DataValue value, Int32 baseRevisionId, String summary)
         {
             Dictionary<String, String> parameters = new Dictionary<String, String>()
@@ -177,10 +177,10 @@ namespace Wikibase
         /// </summary>
         /// <param name="claim">GUID identifying the claim</param>
         /// <param name="snakType">The type of the snak</param>
-        /// <param name="value">The value of the snak when creating a claim with a snak that has a value</param>
-        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
-        /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
+        /// <param name="value">The value of the snak when creating a claim with a snak that has a value.</param>
+        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on.</param>
+        /// <param name="summary">The summary for the change.</param>
+        /// <returns>The returned json object from the server.</returns>
         internal JsonObject setClaimValue(String claim, String snakType, DataValue value, Int32 baseRevisionId, String summary)
         {
             Dictionary<String, String> parameters = new Dictionary<String, String>()
@@ -202,7 +202,7 @@ namespace Wikibase
         /// <param name="claims">The claims</param>
         /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
         /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
+        /// <returns>The returned json object from the server.</returns>
         internal JsonObject removeClaims(String[] claims, Int32 baseRevisionId, String summary)
         {
             Dictionary<String, String> parameters = new Dictionary<String, String>()
@@ -221,7 +221,7 @@ namespace Wikibase
         /// <param name="reference">A hash of the reference that should be updated. When not provided, a new reference is created</param>
         /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
         /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
+        /// <returns>The returned json object from the server.</returns>
         internal JsonObject setReference(String statement, JsonObject snaks, String reference, Int32 baseRevisionId, String summary)
         {
             Dictionary<String, String> parameters = new Dictionary<String, String>()
@@ -244,7 +244,7 @@ namespace Wikibase
         /// <param name="references">The hashes of the references that should be removed</param>
         /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
         /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
+        /// <returns>The returned json object from the server.</returns>
         internal JsonObject removeReferences(String statement, String[] references, Int32 baseRevisionId, String summary)
         {
             Dictionary<string, string> parameters = new Dictionary<String, String>()
@@ -260,10 +260,12 @@ namespace Wikibase
         /// Set a qualifier.
         /// </summary>
         /// <param name="statement">GUID identifying the statement</param>
-        /// <param name="snak">The snak to set the reference to. Array with property ids pointing to arrays containing the snaks for that property</param>
-        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
-        /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
+        /// <param name="snakType">The type of the snak.</param>
+        /// <param name="property">The id of the snak property.</param>
+        /// <param name="value">The value of the snak when creating a claim with a snak that has a value.</param>
+        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on.</param>
+        /// <param name="summary">The summary for the change.</param>
+        /// <returns>The returned json object from the server.</returns>
         internal JsonObject setQualifier(String statement, String snakType, String property, DataValue value, Int32 baseRevisionId, String summary)
         {
             Dictionary<String, String> parameters = new Dictionary<String, String>()
@@ -273,7 +275,7 @@ namespace Wikibase
                 { "snaktype", snakType },
                 { "property", property }
             };
-            if (value != null)
+            if ( value != null )
             {
                 parameters["value"] = value.Encode().ToString();
             }
@@ -284,18 +286,18 @@ namespace Wikibase
         /// <summary>
         /// Remove the qualifiers.
         /// </summary>
-        /// <param name="statement">GUID identifying the statement</param>
-        /// <param name="references">The hashes of the qualifiers that should be removed</param>
-        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on</param>
-        /// <param name="summary">The summary for the change</param>
-        /// <returns>The result</returns>
-        internal JsonObject removeQualifier(String statement, String[] references, Int32 baseRevisionId, String summary)
+        /// <param name="statement">GUID identifying the statement.</param>
+        /// <param name="qualifiers">The hashes of the qualifiers that should be removed.</param>
+        /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on.</param>
+        /// <param name="summary">The summary for the change.</param>
+        /// <returns>The returned json object from the server.</returns>
+        internal JsonObject removeQualifier(String statement, String[] qualifiers, Int32 baseRevisionId, String summary)
         {
             Dictionary<string, string> parameters = new Dictionary<String, String>()
             {
                 { "action", "wbremovequalifiers" },
                 { "statement", statement },
-                { "qualifiers", string.Join("|", references) }
+                { "qualifiers", string.Join("|", qualifiers) }
             };
             return this.editAction(parameters, new Dictionary<String, String>(), baseRevisionId, summary);
         }
@@ -307,9 +309,9 @@ namespace Wikibase
         /// <param name="postFields">The post fields.</param>
         /// <param name="baseRevisionId">The numeric identifier for the revision to base the modification on.</param>
         /// <param name="summary">The summary for the change.</param>
-        /// <returns>The result.</returns>
+        /// <returns>The returned json object from the server.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="parameters"/> or <paramref name="postFields"/> is <c>null</c>.</exception>
-        protected JsonObject editAction(Dictionary<String, String> parameters, Dictionary<String, String> postFields, Int32 baseRevisionId, String summary)
+        private JsonObject editAction(Dictionary<String, String> parameters, Dictionary<String, String> postFields, Int32 baseRevisionId, String summary)
         {
             if ( parameters == null )
                 throw new ArgumentNullException("parameters");
