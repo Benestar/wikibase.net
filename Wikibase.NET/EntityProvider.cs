@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Wikibase
 {
@@ -41,12 +42,12 @@ namespace Wikibase
         /// <param name="languages">The languages. <c>null</c> to get all languages.</param>
         /// <returns>The entities.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="ids"/> is <c>null</c>.</exception>
-        public Entity[] getEntitiesFromIds(EntityId[] ids, string[] languages)
+        public Entity[] getEntitiesFromIds(EntityId[] ids, String[] languages)
         {
             if ( ids == null )
                 throw new ArgumentNullException("ids");
 
-            string[] prefixedIds = new string[ids.Length];
+            String[] prefixedIds = new String[ids.Length];
             for ( int i = 0 ; i < ids.Length ; i++ )
             {
                 prefixedIds[i] = ids[i].PrefixedId;
@@ -70,7 +71,7 @@ namespace Wikibase
         /// <param name="id">The entity id</param>
         /// <param name="languages">The languages</param>
         /// <returns>The entity</returns>
-        public Entity getEntityFromId(EntityId id, string[] languages)
+        public Entity getEntityFromId(EntityId id, String[] languages)
         {
             Entity[] entities = this.getEntitiesFromIds(new EntityId[] { id }, languages);
             foreach ( Entity entity in entities )
@@ -86,7 +87,7 @@ namespace Wikibase
         /// <param name="sites">The sites</param>
         /// <param name="titles">The titles</param>
         /// <returns>The entities</returns>
-        public Entity[] getEntitiesFromSitelinks(string[] sites, string[] titles)
+        public Entity[] getEntitiesFromSitelinks(String[] sites, String[] titles)
         {
             return this.getEntitiesFromSitelinks(sites, titles, null);
         }
@@ -98,7 +99,7 @@ namespace Wikibase
         /// <param name="titles">The titles</param>
         /// <param name="languages">The languages</param>
         /// <returns>The entities</returns>
-        public Entity[] getEntitiesFromSitelinks(string[] sites, string[] titles, string[] languages)
+        public Entity[] getEntitiesFromSitelinks(String[] sites, String[] titles, String[] languages)
         {
             return this.api.getEntitesFromSitelinks(sites, titles, languages);
         }
@@ -109,7 +110,7 @@ namespace Wikibase
         /// <param name="site">The site</param>
         /// <param name="title">The title</param>
         /// <returns>The entity</returns>
-        public Entity getEntityFromSitelink(string site, string title)
+        public Entity getEntityFromSitelink(String site, String title)
         {
             return this.getEntityFromSitelink(site, title, null);
         }
@@ -121,14 +122,10 @@ namespace Wikibase
         /// <param name="title">The title</param>
         /// <param name="languages">The languages</param>
         /// <returns>The entity</returns>
-        public Entity getEntityFromSitelink(string site, string title, string[] languages)
+        public Entity getEntityFromSitelink(String site, String title, String[] languages)
         {
-            Entity[] entities = this.getEntitiesFromSitelinks(new string[] { site }, new string[] { title }, languages);
-            foreach ( Entity entity in entities )
-            {
-                return entity;
-            }
-            return null;
+            Entity[] entities = this.getEntitiesFromSitelinks(new String[] { site }, new String[] { title }, languages);
+            return entities.FirstOrDefault();
         }
     }
 }

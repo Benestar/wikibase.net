@@ -30,11 +30,12 @@ namespace Wikibase
         /// <param name="type">The type</param>
         /// <param name="propertyId">The property id</param>
         /// <param name="dataValue">The data value</param>
-        /// <param name="statement">The statement this qualifier belongs to.</value>
+        /// <param name="statement">The statement this qualifier belongs to.</param>
         public Qualifier(Statement statement, SnakType type, EntityId propertyId, DataValue dataValue)
             : base(type, propertyId, dataValue)
         {
             this.Statement = statement;
+            Statement.Qualifiers.Add(this);
         }
 
         /// <summary>
