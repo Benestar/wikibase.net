@@ -6,21 +6,26 @@ using MinimalJson;
 namespace Wikibase
 {
     /// <summary>
-    /// An item
+    /// An item.
     /// </summary>
     public class Item : Entity
     {
-        private Dictionary<string, string> sitelinks = new Dictionary<string, string>();
+        private Dictionary<String, String> sitelinks = new Dictionary<String, String>();
 
         /// <summary>
-        /// Constructor
+        /// Creates a new instance of <see cref="Item"/>.
         /// </summary>
-        /// <param name="api">The api</param>
+        /// <param name="api">The api.</param>
         public Item(WikibaseApi api)
             : base(api)
         {
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Item"/> and fill it with <paramref name="data"/>.
+        /// </summary>
+        /// <param name="api">The api.</param>
+        /// <param name="data">Json object to be parsed and added.</param>
         internal Item(WikibaseApi api, JsonObject data)
             : base(api, data)
         {
@@ -51,10 +56,12 @@ namespace Wikibase
         /// <summary>
         /// Get all sitelinks.
         /// </summary>
-        /// <returns>The sitelinks</returns>
-        public Dictionary<string, string> getSitelinks()
+        /// <returns>The sitelinks.</returns>
+        /// <remarks>Key is the project name, value the page name. To modify the sitelinks, don't modify this dictionary, but use
+        /// <see cref="setSitelink"/> and <see cref="removeSitelink"/>.</remarks>
+        public Dictionary<String, String> getSitelinks()
         {
-            return new Dictionary<string, string>(sitelinks);
+            return new Dictionary<String, String>(sitelinks);
         }
 
         /// <summary>
@@ -62,7 +69,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="site">The site</param>
         /// <returns></returns>
-        public string getSitelink(string site)
+        public String getSitelink(String site)
         {
             return sitelinks[site];
         }
@@ -72,7 +79,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="site">The site.</param>
         /// <param name="title">The sitelink.</param>
-        public void setSitelink(string site, string title)
+        public void setSitelink(String site, String title)
         {
             this.sitelinks[site] = title;
             if ( this.changes.get("sitelinks") == null )
@@ -91,8 +98,8 @@ namespace Wikibase
         /// Remove the sitelink for the given site.
         /// </summary>
         /// <param name="site">The site</param>
-        /// <returns>If the sitelink was removed successfully</returns>
-        public bool removeSitelink(string site)
+        /// <returns><c>true</c> if the sitelink was removed successfully, <c>false</c> otherwise.</returns>
+        public Boolean removeSitelink(String site)
         {
             if ( sitelinks.Remove(site) )
             {
@@ -115,7 +122,7 @@ namespace Wikibase
         /// Gets the type identifier of the type at server side.
         /// </summary>
         /// <returns>The type identifier.</returns>
-        protected override string getType()
+        protected override String getType()
         {
             return "item";
         }

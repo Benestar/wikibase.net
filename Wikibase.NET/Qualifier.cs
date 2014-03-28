@@ -16,13 +16,21 @@ namespace Wikibase
         /// Gets the statement this qualifier belongs to.
         /// </summary>
         /// <value>The statement this qualifier belongs to.</value>
-        public Claim Statement { get; private set; }
+        public Claim Statement
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Gets the hash.
         /// </summary>
         /// <value>The hash.</value>
-        public String Hash { get; private set; }
+        public String Hash
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Constructor
@@ -56,23 +64,23 @@ namespace Wikibase
         {
             if ( data == null )
                 throw new ArgumentNullException("data");
-            
+
             this.Statement = statement;
             this.FillFromArray(data);
         }
 
-                /// <summary>
+        /// <summary>
         /// Fills the snak with data parsed from a JSon array.
         /// </summary>
         /// <param name="data">JSon array to parse.</param>
         /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-        protected virtual void FillFromArray(JsonObject data)
+        protected override void FillFromArray(JsonObject data)
         {
-            if (data == null)
+            if ( data == null )
                 throw new ArgumentNullException("data");
 
             base.FillFromArray(data);
-            if (data.get("hash") != null)
+            if ( data.get("hash") != null )
             {
                 this.Hash = data.get("hash").asString();
             }
@@ -85,11 +93,11 @@ namespace Wikibase
         /// <exception cref="InvalidOperationException">Statement has no id because not saved yet.</exception>
         public void Save(String summary)
         {
-            if (this.Statement.id == null)
+            if ( this.Statement.id == null )
             {
                 throw new InvalidOperationException("The statement has no Id. Please save the statement containing it first.");
             }
-            JsonObject result = this.Statement.entity.api.setQualifier(this.Statement.id, _snakTypeIdentifiers[this.Type], this.PropertyId.PrefixedId,DataValue, this.Statement.entity.lastRevisionId, summary);
+            JsonObject result = this.Statement.entity.api.setQualifier(this.Statement.id, _snakTypeIdentifiers[this.Type], this.PropertyId.PrefixedId, DataValue, this.Statement.entity.lastRevisionId, summary);
             this.UpdateDataFromResult(result);
         }
 
@@ -99,22 +107,22 @@ namespace Wikibase
         /// <param name="result">Json result.</param>
         protected void UpdateDataFromResult(JsonObject result)
         {
-            if (result == null)
+            if ( result == null )
                 throw new ArgumentNullException("result");
 
             // result is a complete claim
-            if (result.get("claim") != null)
+            if ( result.get("claim") != null )
             {
                 var claim = result.get("claim").asObject();
-                if (claim.get("qualifiers") != null)
+                if ( claim.get("qualifiers") != null )
                 {
                     var qualifiers = claim.get("qualifiers").asObject();
-                    foreach (var entry in qualifiers.names())
+                    foreach ( var entry in qualifiers.names() )
                     {
-                        if (new EntityId(entry).Equals(PropertyId))
+                        if ( new EntityId(entry).Equals(PropertyId) )
                         {
                             var json = qualifiers.get(entry).asArray();
-                            foreach (var value in json)
+                            foreach ( var value in json )
                             {
                                 FillFromArray(value as JsonObject);
                             }
@@ -125,6 +133,5 @@ namespace Wikibase
 
             this.Statement.entity.updateLastRevisionIdFromResult(result);
         }
-
     }
 }
