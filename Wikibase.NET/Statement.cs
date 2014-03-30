@@ -111,7 +111,7 @@ namespace Wikibase
                 foreach ( JsonValue value in data.get(ReferencesJsonName).asArray() )
                 {
                     Reference reference = new Reference(this, value.asObject());
-                    this.references.Add(reference.InternalId, reference);
+                    this.references[reference.InternalId]= reference;
                 }
             }
         }
