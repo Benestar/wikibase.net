@@ -19,12 +19,12 @@ namespace Wikibase.DataValues
         public const String TypeJsonName = "monolingualtext";
 
         /// <summary>
-        /// The name of the <see cref="Amount"/> property in the serialized json object.
+        /// The name of the <see cref="Text"/> property in the serialized json object.
         /// </summary>
         private const String TextJsonName = "text";
 
         /// <summary>
-        /// The name of the <see cref="Amount"/> property in the serialized json object.
+        /// The name of the <see cref="Language"/> property in the serialized json object.
         /// </summary>
         private const String LanguageJsonName = "language";
 
