@@ -51,6 +51,9 @@ namespace Wikibase
         private const String DataValueJsonName = "datavalue";
 
         // TODO - make it a property instead
+        /// <summary>
+        /// JSon identifiers for the <see cref="SnakType"/>.
+        /// </summary>
         protected static Dictionary<SnakType, String> _snakTypeIdentifiers = new Dictionary<SnakType, String>()
         {
             {SnakType.None,"none"},

@@ -12,6 +12,30 @@ namespace Wikibase
     {
         private Dictionary<String, String> sitelinks = new Dictionary<String, String>();
 
+        #region Json names
+
+        /// <summary>
+        /// The name of the <see cref="sitelinks"/> property in the serialized json object.
+        /// </summary>
+        private const String SiteLinksJsonName = "sitelinks";
+
+        /// <summary>
+        /// The name of the site property of a sitelink in the serialized json object.
+        /// </summary>
+        private const String SiteLinksSiteJsonName = "site";
+
+        /// <summary>
+        /// The name of the title property of a sitelink in the serialized json object.
+        /// </summary>
+        private const String SiteLinksTitleJsonName = "title";
+
+        /// <summary>
+        /// The name of the bagdes property of a sitelink in the serialized json object.
+        /// </summary>
+        private const String SiteLinksBadgesJsonName = "badges";
+
+        #endregion Json names
+
         /// <summary>
         /// Creates a new instance of <see cref="Item"/>.
         /// </summary>
@@ -42,13 +66,14 @@ namespace Wikibase
                 throw new ArgumentNullException("data");
 
             base.fillData(data);
-            if ( data.get("sitelinks") != null )
+            if ( data.get(SiteLinksJsonName) != null )
             {
                 this.sitelinks.Clear();
-                foreach ( JsonObject.Member member in data.get("sitelinks").asObject() )
+                foreach ( JsonObject.Member member in data.get(SiteLinksJsonName).asObject() )
                 {
                     JsonObject obj = member.value.asObject();
-                    this.sitelinks.Add(obj.get("site").asString(), obj.get("title").asString());
+                    this.sitelinks.Add(obj.get(SiteLinksSiteJsonName).asString(), obj.get(SiteLinksTitleJsonName).asString());
+                    // ToDo: parse badges
                 }
             }
         }
@@ -82,15 +107,15 @@ namespace Wikibase
         public void setSitelink(String site, String title)
         {
             this.sitelinks[site] = title;
-            if ( this.changes.get("sitelinks") == null )
+            if ( this.changes.get(SiteLinksJsonName) == null )
             {
-                this.changes.set("sitelinks", new JsonObject());
+                this.changes.set(SiteLinksJsonName, new JsonObject());
             }
-            this.changes.get("sitelinks").asObject().set(
+            this.changes.get(SiteLinksJsonName).asObject().set(
                 site,
                 new JsonObject()
-                    .add("site", site)
-                    .add("title", title)
+                    .add(SiteLinksSiteJsonName, site)
+                    .add(SiteLinksTitleJsonName, title)
             );
         }
 
@@ -103,15 +128,15 @@ namespace Wikibase
         {
             if ( sitelinks.Remove(site) )
             {
-                if ( this.changes.get("sitelinks") == null )
+                if ( this.changes.get(SiteLinksJsonName) == null )
                 {
-                    this.changes.set("sitelinks", new JsonObject());
+                    this.changes.set(SiteLinksJsonName, new JsonObject());
                 }
-                this.changes.get("sitelinks").asObject().set(
+                this.changes.get(SiteLinksJsonName).asObject().set(
                     site,
                     new JsonObject()
-                        .add("site", site)
-                        .add("title", "")
+                        .add(SiteLinksSiteJsonName, site)
+                        .add(SiteLinksTitleJsonName, "")
                 );
                 return true;
             }
