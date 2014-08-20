@@ -29,6 +29,8 @@ namespace Wikibase.DataValues
                     return new GlobeCoordinateValue(value);
                 case QuantityValue.TypeJsonName:
                     return new QuantityValue(value);
+                case MonolingualTextValue.TypeJsonName:
+                    return new MonolingualTextValue(value);
                 default:
                     throw new NotSupportedException("Unsupported type " + type);
             }
