@@ -318,7 +318,7 @@ namespace Wikibase
             if ( postFields == null )
                 throw new ArgumentNullException("postFields");
 
-            parameters["token"] = this.getEditToken();
+            postFields["token"] = this.getEditToken();
             if ( baseRevisionId != 0 )
             {
                 parameters["baserevid"] = baseRevisionId.ToString(CultureInfo.InvariantCulture);
