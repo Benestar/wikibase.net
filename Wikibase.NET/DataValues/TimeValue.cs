@@ -177,21 +177,29 @@ namespace Wikibase.DataValues
             }
             set
             {
-                FullValue = value.ToString("+0000000yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
+                FullValue = value.ToString("+yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
             }
         }
 
         private DateTime GetDateTimeValue()
         {
-            if ( !FullValue.StartsWith("+0000000", StringComparison.Ordinal) )
+            if ( FullValue.StartsWith("+0000000", StringComparison.Ordinal) )
+            {
+                return DateTime.Parse(FullValue.Substring(8), CultureInfo.InvariantCulture);
+            }
+            if ( FullValue.StartsWith("+", StringComparison.Ordinal) )
+            {
+                return DateTime.Parse(FullValue.Substring(1), CultureInfo.InvariantCulture);
+            }
+            else
+            {
                 throw new InvalidOperationException("Time value out of range");
-
-            return DateTime.Parse(FullValue.Substring(8), CultureInfo.InvariantCulture);
+            }
         }
 
         /// <summary>
         /// Point in time, represented per ISO8601
-        /// The year always having 11 digits, the date always be signed, in the format +00000002013-01-01T00:00:00Z
+        /// The year can have up to 11 digits, the date always be signed, in the format +00000002013-01-01T00:00:00Z
         /// </summary>
         public String FullValue
         {
