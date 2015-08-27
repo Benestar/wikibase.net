@@ -114,16 +114,17 @@ namespace Wikibase
             {
                 this.id = data.get("id").asString();
             }
-            if ( data.get("qualifiers") != null )
+            var qualifiersData = data.get("qualifiers");
+            if ( qualifiersData != null && qualifiersData.isObject() )
             {
-                var qualifiers = data.get("qualifiers").asObject();
+                var qualifiers = qualifiersData.asObject();
 
                 foreach ( var entry in qualifiers.names() )
                 {
                     var json = qualifiers.get(entry).asArray();
                     foreach ( var value in json )
                     {
-                        var parsedQualifier = new Qualifier(this,value as JsonObject);
+                        var parsedQualifier = new Qualifier(this, value as JsonObject);
                         Qualifiers.Add(parsedQualifier);
                     }
                 }

@@ -69,11 +69,15 @@ namespace Wikibase
             if ( data.get(SiteLinksJsonName) != null )
             {
                 this.sitelinks.Clear();
-                foreach ( JsonObject.Member member in data.get(SiteLinksJsonName).asObject() )
+                var jasonSiteLinks = data.get(SiteLinksJsonName);
+                if ( jasonSiteLinks != null && jasonSiteLinks.isObject() )
                 {
-                    JsonObject obj = member.value.asObject();
-                    this.sitelinks.Add(obj.get(SiteLinksSiteJsonName).asString(), obj.get(SiteLinksTitleJsonName).asString());
-                    // ToDo: parse badges
+                    foreach ( JsonObject.Member member in jasonSiteLinks.asObject() )
+                    {
+                        JsonObject obj = member.value.asObject();
+                        this.sitelinks.Add(obj.get(SiteLinksSiteJsonName).asString(), obj.get(SiteLinksTitleJsonName).asString());
+                        // ToDo: parse badges
+                    }
                 }
             }
         }
