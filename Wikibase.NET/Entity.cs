@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MinimalJson;
 
@@ -13,61 +14,104 @@ namespace Wikibase
         /// <summary>
         /// The entity id
         /// </summary>
-        public EntityId id { get; private set; }
+        public EntityId id
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// The last revision id
         /// </summary>
-        public int lastRevisionId { get; set; }
+        public int lastRevisionId
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The api
         /// </summary>
-        public WikibaseApi api { get; private set; }
+        public WikibaseApi api
+        {
+            get;
+            private set;
+        }
 
-        private Dictionary<string, string> labels = new Dictionary<string,string>();
+        /// <summary>
+        /// Labels, the actual name. Key is the language editifier, value the label.
+        /// </summary>
+        private Dictionary<String, String> labels = new Dictionary<String, String>();
 
-        private Dictionary<string, string> descriptions = new Dictionary<string,string>();
+        /// <summary>
+        /// Descriptions, to explain the item. Key is the language editifier, value the description.
+        /// </summary>
+        private Dictionary<String, String> descriptions = new Dictionary<String, String>();
 
-        private Dictionary<string, List<string>> aliases = new Dictionary<string,List<string>>();
+        /// <summary>
+        /// Aliases. Key is the language editifier, value a list of aliases in the given language.
+        /// </summary>
+        private Dictionary<String, List<String>> aliases = new Dictionary<String, List<String>>();
 
-        private Dictionary<string, Dictionary<string, Claim>> claims = new Dictionary<string,Dictionary<string,Claim>>();
+        /// <summary>
+        /// Claims. Key is the property Id, value a dictionary with the claims internal id as the key and the actual claim as the value.
+        /// </summary>
+        private Dictionary<String, Dictionary<String, Claim>> claims = new Dictionary<String, Dictionary<String, Claim>>();
 
+        /// <summary>
+        /// Changes cache.
+        /// </summary>
         protected JsonObject changes = new JsonObject();
 
         /// <summary>
-        /// Constructor
+        /// Constructor creating a blank entity instance.
+        /// </summary>
+        /// <param name="api">The api.</param>
+        public Entity(WikibaseApi api)
+            : this(api, new JsonObject())
+        {
+        }
+
+        /// <summary>
+        /// Constructor creating an entitiy from a Json object.
         /// </summary>
         /// <param name="api">The api</param>
-        public Entity(WikibaseApi api) : this(api, new JsonObject()) { }
-
+        /// <param name="data">The json object to be parsed.</param>
         internal Entity(WikibaseApi api, JsonObject data)
         {
             this.api = api;
             this.fillData(data);
         }
 
+        /// <summary>
+        /// Parses the <paramref name="data"/> and adds the results to this instance.
+        /// </summary>
+        /// <param name="data"><see cref="JsonObject"/> to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
         protected virtual void fillData(JsonObject data)
         {
-            if (data.get("id") != null)
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
+            if ( data.get("id") != null )
             {
-                this.id = EntityId.newFromPrefixedId(data.get("id").asString());
+                this.id = new EntityId(data.get("id").asString());
             }
-            if (data.get("lastrevid") != null)
+            if ( data.get("lastrevid") != null )
             {
                 this.lastRevisionId = data.get("lastrevid").asInt();
             }
             JsonValue returnedLabels = data.get("labels");
             if ( (returnedLabels != null) && (returnedLabels.isObject()) )
-            if (data.get("labels") != null)
-            {
+                if ( data.get("labels") != null )
+                {
                     labels.Clear();
                     foreach ( JsonObject.Member member in returnedLabels.asObject() )
-                {
-                    JsonObject obj = member.value.asObject();
-                    this.labels.Add(obj.get("language").asString(), obj.get("value").asString());
+                    {
+                        JsonObject obj = member.value.asObject();
+                        this.labels.Add(obj.get("language").asString(), obj.get("value").asString());
+                    }
                 }
-            }
             JsonValue returnedDescriptions = data.get("descriptions");
             if ( (returnedDescriptions != null) && (returnedDescriptions.isObject()) )
             {
@@ -86,7 +130,7 @@ namespace Wikibase
                 foreach ( JsonObject.Member member in returnedAliases.asObject() )
                 {
                     List<String> list = new List<String>();
-                    foreach (JsonValue value in member.value.asArray())
+                    foreach ( JsonValue value in member.value.asArray() )
                     {
                         list.Add(value.asObject().get("value").asString());
                     }
@@ -100,7 +144,7 @@ namespace Wikibase
                 foreach ( JsonObject.Member member in returnedClaims.asObject() )
                 {
                     Dictionary<String, Claim> list = new Dictionary<String, Claim>();
-                    foreach (JsonValue value in member.value.asArray())
+                    foreach ( JsonValue value in member.value.asArray() )
                     {
                         Claim claim = Claim.newFromArray(this, value.asObject());
                         list.Add(claim.internalId, claim);
@@ -112,9 +156,9 @@ namespace Wikibase
 
         internal static Entity newFromArray(WikibaseApi api, JsonObject data)
         {
-            if (data.get("type") != null)
+            if ( data.get("type") != null )
             {
-                switch (data.get("type").asString())
+                switch ( data.get("type").asString() )
                 {
                     case "item":
                         return new Item(api, data);
@@ -129,51 +173,67 @@ namespace Wikibase
         /// Get all labels.
         /// </summary>
         /// <returns>The labels</returns>
-        public Dictionary<string, string> getLabels()
+        /// <remarks>Key is the language, value the label.</remarks>
+        public Dictionary<String, String> getLabels()
         {
-            return new Dictionary<string, string>(labels);
+            return new Dictionary<String, String>(labels);
         }
 
         /// <summary>
         /// Get the label for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>The label</returns>
-        public string getLabel(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns>The label.</returns>
+        /// <exception cref="ArgumentException"><paramref name="lang"/> is empty string or <c>null</c>.</exception>
+        public String getLabel(String lang)
         {
+            if ( String.IsNullOrWhiteSpace(lang) )
+                throw new ArgumentException("empty language");
             return labels.ContainsKey(lang) ? labels[lang] : null;
         }
 
         /// <summary>
         /// Set the label for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <param name="value">The label</param>
-        public void setLabel(string lang, string value)
+        /// <param name="lang">The language.</param>
+        /// <param name="value">The label.</param>
+        /// <exception cref="ArgumentException"><paramref name="lang"/> or <paramref name="value"/> is empty string or <c>null</c>.</exception>
+        public void setLabel(String lang, String value)
         {
-            this.labels[lang] = value;
-            if (this.changes.get("labels") == null)
+            if ( String.IsNullOrWhiteSpace(value) )
+                throw new ArgumentException("empty description");
+            if ( String.IsNullOrWhiteSpace(lang) )
+                throw new ArgumentException("empty language");
+
+            if ( getLabel(lang) != value )
             {
-                this.changes.set("labels", new JsonObject());
+                this.labels[lang] = value;
+                if ( this.changes.get("labels") == null )
+                {
+                    this.changes.set("labels", new JsonObject());
+                }
+                this.changes.get("labels").asObject().set(
+                    lang,
+                    new JsonObject()
+                        .add("language", lang)
+                        .add("value", value)
+                );
             }
-            this.changes.get("labels").asObject().set(
-                lang,
-                new JsonObject()
-                    .add("language", lang)
-                    .add("value", value)
-            );
         }
 
         /// <summary>
         /// Remove the label for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>If the label was removed successfully</returns>
-        public bool removeLabel(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns><c>true</c> if the label was removed successfully, <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentException"><paramref name="lang"/> is empty string or <c>null</c>.</exception>
+        public Boolean removeLabel(String lang)
         {
-            if (this.labels.Remove(lang))
+            if ( String.IsNullOrWhiteSpace(lang) )
+                throw new ArgumentException("empty language");
+            if ( this.labels.Remove(lang) )
             {
-                if (this.changes.get("labels") == null)
+                if ( this.changes.get("labels") == null )
                 {
                     this.changes.set("labels", new JsonObject());
                 }
@@ -191,52 +251,69 @@ namespace Wikibase
         /// <summary>
         /// Get all descriptions.
         /// </summary>
-        /// <returns>The descriptions</returns>
-        public Dictionary<string, string> getDescriptions()
+        /// <returns>The descriptions.</returns>
+        /// <remarks>Keys is the language, value the description.</remarks>
+        public Dictionary<String, String> getDescriptions()
         {
-            return new Dictionary<string, string>(descriptions);
+            return new Dictionary<String, String>(descriptions);
         }
 
         /// <summary>
         /// Get the description for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>The description</returns>
-        public string getDescription(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns>The description.</returns>
+        /// <exception cref="ArgumentException"><paramref name="lang"/> is empty string or <c>null</c>.</exception>
+        public string getDescription(String lang)
         {
+            if ( String.IsNullOrWhiteSpace(lang) )
+                throw new ArgumentException("empty language");
             return descriptions.ContainsKey(lang) ? descriptions[lang] : null;
         }
 
         /// <summary>
         /// Set the description for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <param name="value">The label</param>
-        public void setDescription(string lang, string value)
+        /// <param name="lang">The language.</param>
+        /// <param name="value">The description.</param>
+        /// <exception cref="ArgumentException"><paramref name="lang"/> or <paramref name="value"/> is empty string or <c>null</c>.</exception>
+        public void setDescription(String lang, String value)
         {
-            this.descriptions[lang] = value;
-            if (this.changes.get("descriptions") == null)
+            if ( String.IsNullOrWhiteSpace(value) )
+                throw new ArgumentException("empty description");
+            if ( String.IsNullOrWhiteSpace(lang) )
+                throw new ArgumentException("empty language");
+
+            if ( getDescription(lang) != value )
             {
-                this.changes.set("descriptions", new JsonObject());
+                this.descriptions[lang] = value;
+                if ( this.changes.get("descriptions") == null )
+                {
+                    this.changes.set("descriptions", new JsonObject());
+                }
+                this.changes.get("descriptions").asObject().set(
+                    lang,
+                    new JsonObject()
+                        .add("language", lang)
+                        .add("value", value)
+                );
             }
-            this.changes.get("descriptions").asObject().set(
-                lang,
-                new JsonObject()
-                    .add("language", lang)
-                    .add("value", value)
-            );
         }
 
         /// <summary>
         /// Remove the description for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>If the description was removed successfully</returns>
-        public bool removeDescription(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns><c>true</c> if the description was removed successfully, <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentException"><paramref name="lang"/> is empty string or <c>null</c>.</exception>
+        public Boolean removeDescription(String lang)
         {
+            if ( String.IsNullOrWhiteSpace(lang) )
+                throw new ArgumentException("empty language");
+
             if ( this.descriptions.Remove(lang) )
             {
-                if (this.changes.get("descriptions") == null)
+                if ( this.changes.get("descriptions") == null )
                 {
                     this.changes.set("descriptions", new JsonObject());
                 }
@@ -255,10 +332,11 @@ namespace Wikibase
         /// Get all aliases.
         /// </summary>
         /// <returns>The aliases</returns>
-        public Dictionary<string, List<string>> getAliases()
+        /// <value>Key is the language, value a list of aliases.</value>
+        public Dictionary<String, List<String>> getAliases()
         {
-            Dictionary<string, List<string>> copy = new Dictionary<string, List<string>>(aliases);
-            foreach ( KeyValuePair<string, List<string>> pair in aliases )
+            Dictionary<String, List<String>> copy = new Dictionary<String, List<String>>(aliases);
+            foreach ( KeyValuePair<String, List<String>> pair in aliases )
             {
                 copy[pair.Key] = new List<string>(pair.Value);
             }
@@ -268,68 +346,77 @@ namespace Wikibase
         /// <summary>
         /// Get the aliases for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <returns>The aliases</returns>
-        public List<string> getAlias(string lang)
+        /// <param name="lang">The language.</param>
+        /// <returns>The aliases, or <c>null</c> if no aliases are defined for the language.</returns>
+        public List<String> getAlias(String lang)
         {
-            return aliases.ContainsKey(lang) ? new List<string>(aliases[lang]) : null;
+            return aliases.ContainsKey(lang) ? new List<String>(aliases[lang]) : null;
         }
 
         /// <summary>
-        /// Add the alias for the given language.
+        /// Add an alias for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <param name="value">The alias</param>
-        public void addAlias(string lang, string value)
+        /// <param name="lang">The language.</param>
+        /// <param name="value">The alias.</param>
+        public void addAlias(String lang, String value)
         {
-            if (!this.aliases.ContainsKey(lang))
+            if ( !this.aliases.ContainsKey(lang) )
             {
-                this.aliases.Add(lang, new List<string>());
+                this.aliases.Add(lang, new List<String>());
             }
-            this.aliases[lang].Add(value);
-            if (this.changes.get("aliases") == null)
+            if ( !aliases[lang].Contains(value) )
             {
-                this.changes.set("aliases", new JsonArray());
-            }
-            // Override if needed an action on the same alias
-            for(int i = 0; i < this.changes.get("aliases").asArray().size(); i++)
-            {
-                JsonObject obj = this.changes.get("aliases").asArray().get(i).asObject();
-                if (obj.get("language").asString() == lang && obj.get("value").asString() == value)
+                this.aliases[lang].Add(value);
+                if ( this.changes.get("aliases") == null )
                 {
-                    this.changes.get("aliases").asArray().removeAt(i);
-                    break;
+                    this.changes.set("aliases", new JsonArray());
                 }
+                // Override if needed an action on the same alias
+                for ( int i = 0 ; i < this.changes.get("aliases").asArray().size() ; i++ )
+                {
+                    JsonObject obj = this.changes.get("aliases").asArray().get(i).asObject();
+                    if ( obj.get("language").asString() == lang && obj.get("value").asString() == value )
+                    {
+                        this.changes.get("aliases").asArray().removeAt(i);
+                        break;
+                    }
+                }
+                this.changes.get("aliases").asArray().add(
+                    new JsonObject()
+                        .add("language", lang)
+                        .add("value", value)
+                        .add("add", true)
+                );
             }
-            this.changes.get("aliases").asArray().add(
-                new JsonObject()
-                    .add("language", lang)
-                    .add("value", value)
-                    .add("add", true)
-            );
         }
 
         /// <summary>
         /// Remove the alias for the given language.
         /// </summary>
-        /// <param name="lang">The language</param>
-        /// <param name="value">The alias</param>
-        /// <returns>If the alias was removed successfully</returns>
-        public bool removeAlias(string lang, string value)
+        /// <param name="lang">The language.</param>
+        /// <param name="value">The alias.</param>
+        /// <returns><c>true</c> if the alias was removed successfully, <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentException"><paramref name="lang"/> or <paramref name="value"/> is empty string or <c>null</c>.</exception>
+        public Boolean removeAlias(String lang, String value)
         {
-            if (this.aliases.ContainsKey(lang))
+            if ( String.IsNullOrWhiteSpace(lang) )
+                throw new ArgumentException("empty language");
+            if ( String.IsNullOrWhiteSpace(value) )
+                throw new ArgumentException("empty value");
+
+            if ( this.aliases.ContainsKey(lang) )
             {
-                if (this.aliases[lang].Remove(value))
+                if ( this.aliases[lang].Remove(value) )
                 {
-                    if (this.changes.get("aliases") == null)
+                    if ( this.changes.get("aliases") == null )
                     {
                         this.changes.set("aliases", new JsonArray());
                     }
                     // Override if needed an action on the same alias
-                    for (int i = 0; i < this.changes.get("aliases").asArray().size(); i++)
+                    for ( int i = 0 ; i < this.changes.get("aliases").asArray().size() ; i++ )
                     {
                         JsonObject obj = this.changes.get("aliases").asArray().get(i).asObject();
-                        if (obj.get("language").asString() == lang && obj.get("value").asString() == value)
+                        if ( obj.get("language").asString() == lang && obj.get("value").asString() == value )
                         {
                             this.changes.get("aliases").asArray().removeAt(i);
                             break;
@@ -350,37 +437,50 @@ namespace Wikibase
         /// <summary>
         /// Get all claims.
         /// </summary>
-        /// <returns>The claims</returns>
-        public Dictionary<string, Dictionary<string, Claim>> getClaims()
+        /// <returns>The claims.</returns>
+        /// <remarks>Key is property id, value a dictionary in which the key is the internal id and value is the actual claim.</remarks>
+        public Dictionary<String, Dictionary<String, Claim>> getClaims()
         {
-            Dictionary<string, Dictionary<string, Claim>> copy = new Dictionary<string, Dictionary<string, Claim>>(claims);
-            foreach ( KeyValuePair<string, Dictionary<string, Claim>> pair in claims )
+            Dictionary<String, Dictionary<String, Claim>> copy = new Dictionary<String, Dictionary<String, Claim>>(claims);
+            foreach ( KeyValuePair<String, Dictionary<String, Claim>> pair in claims )
             {
-                copy[pair.Key] = new Dictionary<string, Claim>(pair.Value);
+                copy[pair.Key] = new Dictionary<String, Claim>(pair.Value);
             }
             return copy;
         }
 
         /// <summary>
+        /// Gets all claims.
+        /// </summary>
+        /// <value>All claims.</value>
+        public IEnumerable<Claim> Claims
+        {
+            get
+            {
+                return claims.Values.SelectMany(x => x.Values).ToList();
+            }
+        }
+
+        /// <summary>
         /// Get the claims for the given property.
         /// </summary>
-        /// <param name="property">The property</param>
-        /// <returns>The claims</returns>
-        public Dictionary<string, Claim> getClaimsForProperty(string property)
+        /// <param name="property">The property.</param>
+        /// <returns>The claims.</returns>
+        public Dictionary<String, Claim> getClaimsForProperty(String property)
         {
-            return claims.ContainsKey(property) ? new Dictionary<string, Claim>(claims[property]) : null;
+            return claims.ContainsKey(property) ? new Dictionary<String, Claim>(claims[property]) : null;
         }
 
         /// <summary>
         /// Add the claim.
         /// </summary>
-        /// <param name="claim">The claim</param>
+        /// <param name="claim">The claim.</param>
         internal void addClaim(Claim claim)
         {
-            string property = claim.mainSnak.propertyId.getPrefixedId();
-            if(!this.claims.ContainsKey(property))
+            string property = claim.mainSnak.PropertyId.PrefixedId;
+            if ( !this.claims.ContainsKey(property) )
             {
-                this.claims[property] = new Dictionary<string,Claim>();
+                this.claims[property] = new Dictionary<string, Claim>();
             }
             this.claims[property][claim.internalId] = claim;
         }
@@ -388,18 +488,18 @@ namespace Wikibase
         /// <summary>
         /// Remove the claim.
         /// </summary>
-        /// <param name="claim">The claim</param>
-        /// <returns>If the claim was removed successfully</returns>
-        internal bool removeClaim(Claim claim)
+        /// <param name="claim">The claim.</param>
+        /// <returns><c>true</c> if the claim was removed successfully, <c>false</c> otherwise.</returns>
+        internal Boolean removeClaim(Claim claim)
         {
-            string property = claim.mainSnak.propertyId.getPrefixedId();
-            if (!this.claims.ContainsKey(property))
+            string property = claim.mainSnak.PropertyId.PrefixedId;
+            if ( !this.claims.ContainsKey(property) )
             {
                 return false;
             }
-            if (this.claims[property].Remove(claim.internalId))
+            if ( this.claims[property].Remove(claim.internalId) )
             {
-                if (this.claims[property].Count == 0)
+                if ( this.claims[property].Count == 0 )
                 {
                     this.claims.Remove(property);
                 }
@@ -411,21 +511,21 @@ namespace Wikibase
         /// <summary>
         /// Save all changes.
         /// </summary>
-        /// <param name="summary">The edit summary</param>
-        public void save(string summary)
+        /// <param name="summary">The edit summary.</param>
+        public void save(String summary)
         {
-            if (!this.changes.isEmpty())
+            if ( !this.changes.isEmpty() )
             {
                 JsonObject result;
-                if(this.id == null)
+                if ( this.id == null )
                 {
                     result = this.api.createEntity(this.getType(), this.changes, this.lastRevisionId, summary);
                 }
                 else
                 {
-                    result = this.api.editEntity(this.id.getPrefixedId(), this.changes, this.lastRevisionId, summary);
+                    result = this.api.editEntity(this.id.PrefixedId, this.changes, this.lastRevisionId, summary);
                 }
-                if (result.get("entity") != null)
+                if ( result.get("entity") != null )
                 {
                     this.fillData(result.get("entity").asObject());
                 }
@@ -436,12 +536,16 @@ namespace Wikibase
 
         internal void updateLastRevisionIdFromResult(JsonObject result)
         {
-            if (result.get("pageinfo") != null && result.get("pageinfo").asObject().get("lastrevid") != null)
+            if ( result.get("pageinfo") != null && result.get("pageinfo").asObject().get("lastrevid") != null )
             {
                 this.lastRevisionId = result.get("pageinfo").asObject().get("lastrevid").asInt();
             }
         }
 
-        protected abstract string getType();
+        /// <summary>
+        /// Gets the type identifier of the type at server side.
+        /// </summary>
+        /// <returns>The type identifier.</returns>
+        protected abstract String getType();
     }
 }

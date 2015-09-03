@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net;
 using System.IO;
+using System.Net;
+using System.Text;
 using System.Web;
 
 namespace Wikibase
 {
     /// <summary>
-    /// Http related code
+    /// Http related code.
     /// </summary>
-    class Http
+    internal class Http
     {
         /// <summary>
-        /// The user agent
+        /// Gets or sets the user agent.
         /// </summary>
-        public string UserAgent { get; set; }
+        /// <value>The user agent.</value>
+        public String UserAgent
+        {
+            get;
+            set;
+        }
 
         private CookieContainer cookies = new CookieContainer();
 
@@ -23,7 +28,7 @@ namespace Wikibase
         /// Constructor
         /// </summary>
         /// <param name="userAgent">The user agent</param>
-        public Http(string userAgent)
+        public Http(String userAgent)
         {
             this.UserAgent = userAgent;
         }
@@ -33,7 +38,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="url">The url</param>
         /// <returns>The response</returns>
-        public string get(string url)
+        public String get(String url)
         {
             return this.post(url, null);
         }
@@ -41,22 +46,22 @@ namespace Wikibase
         /// <summary>
         /// Performs a http post request.
         /// </summary>
-        /// <param name="url">The url</param>
-        /// <param name="postFields">The post fields</param>
-        /// <returns>The response</returns>
-        public string post(string url, Dictionary<string, string> postFields)
+        /// <param name="url">The url.</param>
+        /// <param name="postFields">The post fields.</param>
+        /// <returns>The response.</returns>
+        public String post(String url, Dictionary<String, String> postFields)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
             request.UserAgent = this.UserAgent;
             request.ContentType = "application/x-www-form-urlencoded";
 
-            if (this.cookies.Count == 0)
+            if ( this.cookies.Count == 0 )
                 request.CookieContainer = new CookieContainer();
             else
                 request.CookieContainer = this.cookies;
 
-            if (postFields != null)
+            if ( postFields != null )
             {
                 request.Method = "POST";
                 byte[] postBytes = Encoding.UTF8.GetBytes(this.buildQuery(postFields));
@@ -68,7 +73,7 @@ namespace Wikibase
 
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-            foreach (Cookie cookie in response.Cookies)
+            foreach ( Cookie cookie in response.Cookies )
             {
                 this.cookies.Add(cookie);
             }
@@ -84,12 +89,16 @@ namespace Wikibase
         /// <summary>
         /// Builds a http query string.
         /// </summary>
-        /// <param name="fields">The fields</param>
-        /// <returns>The query string</returns>
-        public string buildQuery(Dictionary<string, string> fields)
+        /// <param name="fields">The fields.</param>
+        /// <returns>The query string.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="fields"/> is <c>null</c>.</exception>
+        public String buildQuery(Dictionary<String, String> fields)
         {
-            string query = "";
-            foreach (KeyValuePair<string, string> field in fields)
+            if ( fields == null )
+                throw new ArgumentNullException("fields");
+
+            String query = String.Empty;
+            foreach ( KeyValuePair<String, String> field in fields )
             {
                 query += HttpUtility.UrlEncode(field.Key) + "=" + HttpUtility.UrlEncode(field.Value) + "&";
             }

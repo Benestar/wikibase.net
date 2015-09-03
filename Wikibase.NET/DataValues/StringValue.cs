@@ -5,28 +5,68 @@ using MinimalJson;
 
 namespace Wikibase.DataValues
 {
+    /// <summary>
+    /// Encapsulates the string value type.
+    /// </summary>
     public class StringValue : DataValue
     {
-        public string str { get; set; }
+        #region Json names
 
-        public StringValue(string str)
+        /// <summary>
+        /// The identifier of this data type in the serialized json object.
+        /// </summary>
+        public const String TypeJsonName = "string";
+
+        #endregion Json names
+
+        /// <summary>
+        /// Gets or sets the string value.
+        /// </summary>
+        /// <value>The string value.</value>
+        public String Value
         {
-            this.str = str;
+            get;
+            set;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="StringValue"/> with the given value.
+        /// </summary>
+        /// <param name="value">Value to be added.</param>
+        public StringValue(String value)
+        {
+            this.Value = value;
+        }
+
+        /// <summary>
+        /// Parses a <see cref="JsonValue"/> to a <see cref="StringValue"/>
+        /// </summary>
+        /// <param name="value"><see cref="JsonValue"/> to be parsed.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         internal StringValue(JsonValue value)
         {
-            this.str = value.asString();
+            if ( value == null )
+                throw new ArgumentNullException("value");
+
+            this.Value = value.asString();
         }
 
-        public override string getType()
+        /// <summary>
+        /// Gets the data type identifier.
+        /// </summary>
+        /// <returns>Data type identifier.</returns>
+        protected override String JsonName()
         {
-            return "string";
+            return TypeJsonName;
         }
 
-        internal override JsonValue encode()
+        /// <summary>
+        /// Encodes the instance in a <see cref="JsonValue"/>.
+        /// </summary>
+        /// <returns>Encoded instance.</returns>
+        internal override JsonValue Encode()
         {
-            return JsonValue.valueOf(str);
+            return JsonValue.valueOf(Value);
         }
     }
 }
