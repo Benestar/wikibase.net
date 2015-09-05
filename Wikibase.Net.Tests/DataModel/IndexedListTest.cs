@@ -40,6 +40,12 @@ namespace Wikibase.Tests.DataModel
         }
 
         [Fact]
+        public void TestNullIndexProvider()
+        {
+            Assert.Throws<ArgumentNullException>(() => new IndexedList<string, SiteLink>(null));
+        }
+
+        [Fact]
         public void TestAccess()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink> (siteLink => siteLink.SiteId) {
