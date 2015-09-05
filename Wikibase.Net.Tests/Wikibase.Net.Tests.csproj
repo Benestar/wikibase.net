@@ -77,16 +77,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Wikibase.net\Wikibase.Net.csproj">
-      <Project>{4fbd573b-8898-46c8-86e3-df95ae20e8c3}</Project>
-      <Name>Wikibase.Net</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="DataModel\DataValues\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Wikibase.Net\Wikibase.Net.csproj">
+      <Project>{4fbd573b-8898-46c8-86e3-df95ae20e8c3}</Project>
+      <Name>Wikibase.Net</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
