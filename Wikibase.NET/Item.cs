@@ -6,32 +6,91 @@ using MinimalJson;
 namespace Wikibase
 {
     /// <summary>
-    /// An item
+    /// An item.
     /// </summary>
     public class Item : Entity
     {
-        private Dictionary<string, string> sitelinks = new Dictionary<string, string>();
+        private Dictionary<String, String> sitelinks = new Dictionary<String, String>();
+
+        #region Json names
 
         /// <summary>
-        /// Constructor
+        /// The name of the <see cref="sitelinks"/> property in the serialized json object.
         /// </summary>
-        /// <param name="api">The api</param>
-        public Item(WikibaseApi api) : base(api) { }
+        private const String SiteLinksJsonName = "sitelinks";
 
-        internal Item(WikibaseApi api, JsonObject data) : base(api, data) { }
+        /// <summary>
+        /// The name of the site property of a sitelink in the serialized json object.
+        /// </summary>
+        private const String SiteLinksSiteJsonName = "site";
 
+        /// <summary>
+        /// The name of the title property of a sitelink in the serialized json object.
+        /// </summary>
+        private const String SiteLinksTitleJsonName = "title";
+
+        /// <summary>
+        /// The name of the bagdes property of a sitelink in the serialized json object.
+        /// </summary>
+        private const String SiteLinksBadgesJsonName = "badges";
+
+        #endregion Json names
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Item"/>.
+        /// </summary>
+        /// <param name="api">The api.</param>
+        public Item(WikibaseApi api)
+            : base(api)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Item"/> and fill it with <paramref name="data"/>.
+        /// </summary>
+        /// <param name="api">The api.</param>
+        /// <param name="data">Json object to be parsed and added.</param>
+        internal Item(WikibaseApi api, JsonObject data)
+            : base(api, data)
+        {
+        }
+
+        /// <summary>
+        /// Parses the <paramref name="data"/> and adds the results to this instance.
+        /// </summary>
+        /// <param name="data"><see cref="JsonObject"/> to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
         protected override void fillData(JsonObject data)
         {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
             base.fillData(data);
+            if ( data.get(SiteLinksJsonName) != null )
+            {
+                this.sitelinks.Clear();
+                var jasonSiteLinks = data.get(SiteLinksJsonName);
+                if ( jasonSiteLinks != null && jasonSiteLinks.isObject() )
+                {
+                    foreach ( JsonObject.Member member in jasonSiteLinks.asObject() )
+                    {
+                        JsonObject obj = member.value.asObject();
+                        this.sitelinks.Add(obj.get(SiteLinksSiteJsonName).asString(), obj.get(SiteLinksTitleJsonName).asString());
+                        // ToDo: parse badges
+                    }
+                }
+            }
         }
 
         /// <summary>
         /// Get all sitelinks.
         /// </summary>
-        /// <returns>The sitelinks</returns>
-        public Dictionary<string, string> getSitelinks()
+        /// <returns>The sitelinks.</returns>
+        /// <remarks>Key is the project name, value the page name. To modify the sitelinks, don't modify this dictionary, but use
+        /// <see cref="setSitelink"/> and <see cref="removeSitelink"/>.</remarks>
+        public Dictionary<String, String> getSitelinks()
         {
-            return new Dictionary<string, string>(sitelinks);
+            return new Dictionary<String, String>(sitelinks);
         }
 
         /// <summary>
@@ -39,7 +98,7 @@ namespace Wikibase
         /// </summary>
         /// <param name="site">The site</param>
         /// <returns></returns>
-        public string getSitelink(string site)
+        public String getSitelink(String site)
         {
             return sitelinks[site];
         }
@@ -47,20 +106,20 @@ namespace Wikibase
         /// <summary>
         /// Set the sitelink for the given site.
         /// </summary>
-        /// <param name="site">The site</param>
-        /// <param name="sitelink">The sitelink</param>
-        public void setSitelink(string site, string title)
+        /// <param name="site">The site.</param>
+        /// <param name="title">The sitelink.</param>
+        public void setSitelink(String site, String title)
         {
             this.sitelinks[site] = title;
-            if (this.changes.get("sitelinks") == null)
+            if ( this.changes.get(SiteLinksJsonName) == null )
             {
-                this.changes.set("sitelinks", new JsonObject());
+                this.changes.set(SiteLinksJsonName, new JsonObject());
             }
-            this.changes.get("sitelinks").asObject().set(
+            this.changes.get(SiteLinksJsonName).asObject().set(
                 site,
                 new JsonObject()
-                    .add("site", site)
-                    .add("title", title)
+                    .add(SiteLinksSiteJsonName, site)
+                    .add(SiteLinksTitleJsonName, title)
             );
         }
 
@@ -68,27 +127,31 @@ namespace Wikibase
         /// Remove the sitelink for the given site.
         /// </summary>
         /// <param name="site">The site</param>
-        /// <returns>If the sitelink was removed successfully</returns>
-        public bool removeSitelink(string site)
+        /// <returns><c>true</c> if the sitelink was removed successfully, <c>false</c> otherwise.</returns>
+        public Boolean removeSitelink(String site)
         {
-            if (sitelinks.Remove(site))
+            if ( sitelinks.Remove(site) )
             {
-                if (this.changes.get("sitelinks") == null)
+                if ( this.changes.get(SiteLinksJsonName) == null )
                 {
-                    this.changes.set("sitelinks", new JsonObject());
+                    this.changes.set(SiteLinksJsonName, new JsonObject());
                 }
-                this.changes.get("sitelinks").asObject().set(
+                this.changes.get(SiteLinksJsonName).asObject().set(
                     site,
                     new JsonObject()
-                        .add("site", site)
-                        .add("title", "")
+                        .add(SiteLinksSiteJsonName, site)
+                        .add(SiteLinksTitleJsonName, "")
                 );
                 return true;
             }
             return false;
         }
 
-        protected override string getType()
+        /// <summary>
+        /// Gets the type identifier of the type at server side.
+        /// </summary>
+        /// <returns>The type identifier.</returns>
+        protected override String getType()
         {
             return "item";
         }
@@ -100,7 +163,7 @@ namespace Wikibase
         /// <returns>The statement</returns>
         public Statement createStatementForSnak(Snak snak)
         {
-            return (Statement) Claim.newFromSnak(this, snak, "statement");
+            return (Statement)Claim.newFromSnak(this, snak, "statement");
         }
     }
 }
