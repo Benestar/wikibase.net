@@ -5,7 +5,7 @@ solution: Wikibase.Net.sln
 sudo: false
 
 install:
-  - nuget restore solution-name.sln
+  - nuget restore Wikibase.Net.sln
   - nuget install xunit.runners -Version 1.9.2 -OutputDirectory testrunner
 
 script:
