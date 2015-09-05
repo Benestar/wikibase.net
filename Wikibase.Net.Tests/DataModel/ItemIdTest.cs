@@ -1,61 +1,61 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class ItemIdTest
     {
-        [TestMethod]
+        [Fact]
         public void TestValidSerialization()
         {
             ItemId itemId = new ItemId("Q42");
-            Assert.AreEqual("Q42", itemId.Serialization);
+            Assert.Equal("Q42", itemId.Serialization);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestInvalidSerialization()
         {
-            new ItemId("FooBar");
+            Assert.Throws<ArgumentException>(() => new ItemId("FooBar"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestPropertyIdSerialization()
         {
-            new ItemId("P123");
+            Assert.Throws<ArgumentException>(() => new ItemId("P123"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestPrefixedSerialization()
         {
-            new ItemId("Foo Q123");
+            Assert.Throws<ArgumentException>(() => new ItemId("Foo Q123"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestSuffixedSerialization()
         {
-            new ItemId("Q123foo");
+            Assert.Throws<ArgumentException>(() => new ItemId("Q123foo"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestZeroSerialization()
         {
-            new ItemId("Q0123");
+            Assert.Throws<ArgumentException>(() => new ItemId("Q0123"));
         }
 
-        [TestMethod]
+        [Fact]
+        public void TestNullSerialization()
+        {
+            Assert.Throws<ArgumentNullException>(() => new ItemId(null));
+        }
+
+        [Fact]
         public void TestEquals()
         {
             ItemId itemId = new ItemId("Q42");
 
-            Assert.IsTrue(itemId.Equals(new ItemId("Q42")));
-            Assert.IsFalse(itemId.Equals(new ItemId("Q123")));
+            Assert.True(itemId.Equals(new ItemId("Q42")));
+            Assert.False(itemId.Equals(new ItemId("Q123")));
         }
     }
 }

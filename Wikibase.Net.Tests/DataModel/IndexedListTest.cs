@@ -1,14 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wikibase.DataModel;
 using System.Collections.Generic;
+using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class IndexedListTest
     {
-        [TestMethod]
+        [Fact]
         public void TestFromList()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink> (
@@ -16,29 +15,31 @@ namespace Wikibase.Tests.DataModel
                 new List<SiteLink> { new SiteLink("enwiki", "Foo") }
             );
 
-            Assert.AreEqual("Foo", list["enwiki"].PageName);
+            Assert.Equal("Foo", list["enwiki"].PageName);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestDuplicateKey()
         {
-            new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
-                new SiteLink("dewiki", "Foo"),
-                new SiteLink("dewiki", "Bar")
-            };
+            Assert.Throws<ArgumentException>(
+                () => new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
+                    new SiteLink("dewiki", "Foo"),
+                    new SiteLink("dewiki", "Bar")
+                }
+            );
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void TestNullKey()
         {
-            new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
-                new SiteLink()
-            };
+            Assert.Throws<ArgumentNullException>(
+                () => new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
+                    new SiteLink()
+                }
+            );
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAccess()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink> (siteLink => siteLink.SiteId) {
@@ -46,12 +47,11 @@ namespace Wikibase.Tests.DataModel
                 new SiteLink("dewiki", "Bar")
             };
 
-            Assert.AreEqual("Foo", list["enwiki"].PageName);
-            Assert.AreEqual("Bar", list["dewiki"].PageName);
+            Assert.Equal("Foo", list["enwiki"].PageName);
+            Assert.Equal("Bar", list["dewiki"].PageName);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
+        [Fact]
         public void TestAccessNotExisting()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
@@ -59,10 +59,10 @@ namespace Wikibase.Tests.DataModel
                 new SiteLink("dewiki", "Bar")
             };
 
-            SiteLink link = list["xxwiki"];
+            Assert.Throws<KeyNotFoundException>(() => list["xxwiki"]);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAdd()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink> (siteLink => siteLink.SiteId) {
@@ -70,21 +70,21 @@ namespace Wikibase.Tests.DataModel
             };
             list.Add(new SiteLink("dewiki", "Bar"));
 
-            Assert.AreEqual("Foo", list["enwiki"].PageName);
-            Assert.AreEqual("Bar", list["dewiki"].PageName);
+            Assert.Equal("Foo", list["enwiki"].PageName);
+            Assert.Equal("Bar", list["dewiki"].PageName);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void TestAddNullKey()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
                 new SiteLink("enwiki", "Foo")
             };
-            list.Add(new SiteLink());
+
+            Assert.Throws<ArgumentNullException>(() => list.Add(new SiteLink()));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestSet()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink> (siteLink => siteLink.SiteId) {
@@ -92,78 +92,78 @@ namespace Wikibase.Tests.DataModel
             };
             list.Set(new SiteLink("enwiki", "Bar"));
 
-            Assert.AreEqual("Bar", list["enwiki"].PageName);
+            Assert.Equal("Bar", list["enwiki"].PageName);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void TestSetNullKey()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
                 new SiteLink("enwiki", "Foo")
             };
-            list.Set(new SiteLink());
+
+            Assert.Throws<ArgumentNullException>(() => list.Set(new SiteLink()));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestAddConflict()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink> (siteLink => siteLink.SiteId) {
                 new SiteLink("enwiki", "Foo")
             };
-            list.Add(new SiteLink("enwiki", "Bar"));
+
+            Assert.Throws<ArgumentException>(() => list.Add(new SiteLink("enwiki", "Bar")));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestContainsKey()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
                 new SiteLink("enwiki", "Foo")
             };
 
-            Assert.IsTrue(list.ContainsKey("enwiki"));
-            Assert.IsFalse(list.ContainsKey("xxwiki"));
+            Assert.True(list.ContainsKey("enwiki"));
+            Assert.False(list.ContainsKey("xxwiki"));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestRemoveExisting()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
                 new SiteLink("enwiki", "Foo")
             };
 
-            Assert.IsTrue(list.Remove("enwiki"));
+            Assert.True(list.Remove("enwiki"));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestRemoveNotExisting()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId) {
                 new SiteLink("enwiki", "Foo")
             };
 
-            Assert.IsFalse(list.Remove("xxwiki"));
+            Assert.False(list.Remove("xxwiki"));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCount()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink> (siteLink => siteLink.SiteId) {
                 new SiteLink("enwiki", "Foo"),
                 new SiteLink("dewiki", "Bar")
             };
-            Assert.AreEqual(2, list.Count);
+            Assert.Equal(2, list.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCountEmpty()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink>(siteLink => siteLink.SiteId);
-            Assert.AreEqual(0, list.Count);
+            Assert.Equal(0, list.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestForeach()
         {
             IndexedList<string, SiteLink> list = new IndexedList<string, SiteLink> (siteLink => siteLink.SiteId) {
@@ -172,8 +172,8 @@ namespace Wikibase.Tests.DataModel
 
             foreach (SiteLink siteLink in list)
             {
-                Assert.AreEqual("enwiki", siteLink.SiteId);
-                Assert.AreEqual("Foo", siteLink.PageName);
+                Assert.Equal("enwiki", siteLink.SiteId);
+                Assert.Equal("Foo", siteLink.PageName);
             }
         }
     }

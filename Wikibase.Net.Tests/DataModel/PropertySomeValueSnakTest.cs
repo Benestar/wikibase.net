@@ -1,45 +1,43 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class PropertySomeValueSnakTest
     {
-        [TestMethod]
+        [Fact]
         public void TestType()
         {
             PropertySomeValueSnak snak = new PropertySomeValueSnak(new PropertyId("P42"));
-            Assert.AreEqual(SnakType.SomeValueSnak, snak.Type);
+            Assert.Equal(SnakType.SomeValueSnak, snak.Type);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPropertyId()
         {
             PropertySomeValueSnak snak = new PropertySomeValueSnak(new PropertyId("P42"));
-            Assert.AreEqual("P42", snak.PropertyId.Serialization);
+            Assert.Equal("P42", snak.PropertyId.Serialization);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPropertyIdSerialization()
         {
             PropertySomeValueSnak snak = new PropertySomeValueSnak("P42");
-            Assert.AreEqual("P42", snak.PropertyId.Serialization);
+            Assert.Equal("P42", snak.PropertyId.Serialization);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void TestPropertyIdNull()
         {
-            new PropertySomeValueSnak((PropertyId)null);
+            Assert.Throws<ArgumentNullException>(() => new PropertySomeValueSnak((PropertyId)null));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestIsSnak()
         {
-            Snak snak = new PropertySomeValueSnak("P42");
-            Assert.IsInstanceOfType(snak, typeof(Snak));
+            PropertySomeValueSnak snak = new PropertySomeValueSnak("P42");
+            Assert.IsAssignableFrom<Snak>(snak);
         }
     }
 }

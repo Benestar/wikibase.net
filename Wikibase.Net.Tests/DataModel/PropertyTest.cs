@@ -1,28 +1,27 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class PropertyTest
     {
-        [TestMethod]
+        [Fact]
         public void TestId()
         {
             Property property = new Property(new PropertyId("P42"));
-            Assert.AreEqual("P42", property.Id.Serialization);
+            Assert.Equal("P42", property.Id.Serialization);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPropertyId()
         {
             Property property = new Property(new PropertyId("P42"));
-            Assert.AreEqual("P42", property.PropertyId.Serialization);
+            Assert.Equal("P42", property.PropertyId.Serialization);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestFingerprint()
         {
             Property property = new Property(
@@ -31,11 +30,11 @@ namespace Wikibase.Tests.DataModel
                 null
             );
 
-            Assert.IsFalse(property.Empty);
-            Assert.AreEqual("foo", property.Fingerprint.Labels["en"].Text);
+            Assert.False(property.Empty);
+            Assert.Equal("foo", property.Fingerprint.Labels["en"].Text);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestStatements()
         {
             Property property = new Property(
@@ -44,23 +43,23 @@ namespace Wikibase.Tests.DataModel
                 new List<Statement> { new Statement(new PropertyNoValueSnak("P42")) }
             );
 
-            Assert.IsFalse(property.Empty);
-            Assert.AreEqual(1, property.Statements.Count);
-            Assert.AreEqual("P42", property.Statements[0].PropertyId.Serialization);
+            Assert.False(property.Empty);
+            Assert.Equal(1, property.Statements.Count);
+            Assert.Equal("P42", property.Statements[0].PropertyId.Serialization);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestEmpty()
         {
             Property property = new Property();
-            Assert.IsTrue(property.Empty);
+            Assert.True(property.Empty);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestEmptyWithId()
         {
             Property property = new Property(new PropertyId("P42"));
-            Assert.IsTrue(property.Empty);
+            Assert.True(property.Empty);
         }
     }
 }

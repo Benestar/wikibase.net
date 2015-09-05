@@ -1,33 +1,30 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class TermTest
     {
-        [TestMethod]
+        [Fact]
         public void TestTerm()
         {
             Term term = new Term("en", "Test");
 
-            Assert.AreEqual("en", term.Language);
-            Assert.AreEqual("Test", term.Text);
+            Assert.Equal("en", term.Language);
+            Assert.Equal("Test", term.Text);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void TestNullLanguage()
         {
-            new Term(null, "Test");
+            Assert.Throws<ArgumentNullException>(() => new Term(null, "Test"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void TestNullText()
         {
-            new Term("en", null);
+            Assert.Throws<ArgumentNullException>(() => new Term("en", null));
         }
     }
 }

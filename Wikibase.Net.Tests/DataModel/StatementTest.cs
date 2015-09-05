@@ -1,22 +1,21 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wikibase.DataModel;
 using System.Collections.Generic;
+using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class StatementTest
     {
-        [TestMethod]
+        [Fact]
         public void TestSnak()
         {
             Statement statement = new Statement(new PropertySomeValueSnak("P42"));
-            Assert.AreEqual("P42", statement.Snak.PropertyId.Serialization);
-            Assert.AreEqual(SnakType.SomeValueSnak, statement.Snak.Type);
+            Assert.Equal("P42", statement.Snak.PropertyId.Serialization);
+            Assert.Equal(SnakType.SomeValueSnak, statement.Snak.Type);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestQualifiers()
         {
             Statement statement = new Statement(
@@ -24,16 +23,16 @@ namespace Wikibase.Tests.DataModel
                 new List<Snak> { new PropertyNoValueSnak("P42"), new PropertySomeValueSnak("P31") }
             );
 
-            Assert.AreEqual(2, statement.Qualifiers.Count);
+            Assert.Equal(2, statement.Qualifiers.Count);
 
-            Assert.AreEqual("P42", statement.Qualifiers[0].PropertyId.Serialization);
-            Assert.AreEqual(SnakType.NoValueSnak, statement.Qualifiers[0].Type);
+            Assert.Equal("P42", statement.Qualifiers[0].PropertyId.Serialization);
+            Assert.Equal(SnakType.NoValueSnak, statement.Qualifiers[0].Type);
 
-            Assert.AreEqual("P31", statement.Qualifiers[1].PropertyId.Serialization);
-            Assert.AreEqual(SnakType.SomeValueSnak, statement.Qualifiers[1].Type);
+            Assert.Equal("P31", statement.Qualifiers[1].PropertyId.Serialization);
+            Assert.Equal(SnakType.SomeValueSnak, statement.Qualifiers[1].Type);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestReferences()
         {
             Statement statement = new Statement(
@@ -42,16 +41,16 @@ namespace Wikibase.Tests.DataModel
                 new List<Snak> { new PropertyNoValueSnak("P42"), new PropertySomeValueSnak("P31") }
             );
 
-            Assert.AreEqual(2, statement.References.Count);
+            Assert.Equal(2, statement.References.Count);
 
-            Assert.AreEqual("P42", statement.References[0].PropertyId.Serialization);
-            Assert.AreEqual(SnakType.NoValueSnak, statement.References[0].Type);
+            Assert.Equal("P42", statement.References[0].PropertyId.Serialization);
+            Assert.Equal(SnakType.NoValueSnak, statement.References[0].Type);
 
-            Assert.AreEqual("P31", statement.References[1].PropertyId.Serialization);
-            Assert.AreEqual(SnakType.SomeValueSnak, statement.References[1].Type);
+            Assert.Equal("P31", statement.References[1].PropertyId.Serialization);
+            Assert.Equal(SnakType.SomeValueSnak, statement.References[1].Type);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestGuid()
         {
             Statement statement = new Statement(
@@ -61,14 +60,14 @@ namespace Wikibase.Tests.DataModel
                 new List<Snak>()
             );
 
-            Assert.AreEqual("statement-guid", statement.Guid);
+            Assert.Equal("statement-guid", statement.Guid);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPropertyId()
         {
             Statement statement = new Statement(new PropertySomeValueSnak("P42"));
-            Assert.AreEqual("P42", statement.PropertyId.Serialization);
+            Assert.Equal("P42", statement.PropertyId.Serialization);
         }
     }
 }

@@ -1,28 +1,27 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class ItemTest
     {
-        [TestMethod]
+        [Fact]
         public void TestId()
         {
             Item item = new Item(new ItemId("Q42"));
-            Assert.AreEqual("Q42", item.Id.Serialization);
+            Assert.Equal("Q42", item.Id.Serialization);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestItemId()
         {
             Item item = new Item(new ItemId("Q42"));
-            Assert.AreEqual("Q42", item.ItemId.Serialization);
+            Assert.Equal("Q42", item.ItemId.Serialization);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestFingerprint()
         {
             Item item = new Item(
@@ -32,11 +31,11 @@ namespace Wikibase.Tests.DataModel
                 null
             );
 
-            Assert.IsFalse(item.Empty);
-            Assert.AreEqual("foo", item.Fingerprint.Labels["en"].Text);
+            Assert.False(item.Empty);
+            Assert.Equal("foo", item.Fingerprint.Labels["en"].Text);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestStatements()
         {
             Item item = new Item(
@@ -46,12 +45,12 @@ namespace Wikibase.Tests.DataModel
                 null
             );
 
-            Assert.IsFalse(item.Empty);
-            Assert.AreEqual(1, item.Statements.Count);
-            Assert.AreEqual("P42", item.Statements[0].PropertyId.Serialization);
+            Assert.False(item.Empty);
+            Assert.Equal(1, item.Statements.Count);
+            Assert.Equal("P42", item.Statements[0].PropertyId.Serialization);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestSitelinks()
         {
             Item item = new Item(
@@ -61,24 +60,24 @@ namespace Wikibase.Tests.DataModel
                 new List<SiteLink> { new SiteLink("enwiki", "Foo"), new SiteLink("dewiki", "Bar") }
             );
 
-            Assert.IsFalse(item.Empty);
-            Assert.AreEqual(2, item.Sitelinks.Count);
-            Assert.AreEqual(item.Sitelinks["enwiki"].PageName, "Foo");
-            Assert.AreEqual(item.Sitelinks["dewiki"].PageName, "Bar");
+            Assert.False(item.Empty);
+            Assert.Equal(2, item.Sitelinks.Count);
+            Assert.Equal(item.Sitelinks["enwiki"].PageName, "Foo");
+            Assert.Equal(item.Sitelinks["dewiki"].PageName, "Bar");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestEmpty()
         {
             Item item = new Item();
-            Assert.IsTrue(item.Empty);
+            Assert.True(item.Empty);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestEmptyWithId()
         {
             Item item = new Item(new ItemId("Q42"));
-            Assert.IsTrue(item.Empty);
+            Assert.True(item.Empty);
         }
     }
 }

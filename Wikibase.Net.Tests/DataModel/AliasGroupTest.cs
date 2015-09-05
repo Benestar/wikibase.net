@@ -1,56 +1,53 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wikibase.DataModel;
 using System.Collections.Generic;
+using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class AliasGroupTest
     {
-        [TestMethod]
+        [Fact]
         public void TestAliasGroup()
         {
             AliasGroup aliasGroup = new AliasGroup("en", new HashSet<string> { "foo", "bar" });
 
-            Assert.AreEqual("en", aliasGroup.Language);
-            Assert.AreEqual(2, aliasGroup.Aliases.Count);
-            Assert.IsTrue(aliasGroup.Aliases.Contains("foo"));
-            Assert.IsTrue(aliasGroup.Aliases.Contains("bar"));
+            Assert.Equal("en", aliasGroup.Language);
+            Assert.Equal(2, aliasGroup.Aliases.Count);
+            Assert.True(aliasGroup.Aliases.Contains("foo"));
+            Assert.True(aliasGroup.Aliases.Contains("bar"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void TestNullLanguage()
         {
-            new AliasGroup(null, new HashSet<string>());
+            Assert.Throws<ArgumentNullException>(() => new AliasGroup(null, new HashSet<string>()));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void TestNullAliases()
         {
-            new AliasGroup("en", null);
+            Assert.Throws<ArgumentNullException>(() => new AliasGroup("en", null));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAddAlias()
         {
             AliasGroup aliasGroup = new AliasGroup("en", new HashSet<string> { "foo", "bar" });
             aliasGroup.Aliases.Add("baz");
 
-            Assert.AreEqual(3, aliasGroup.Aliases.Count);
-            Assert.IsTrue(aliasGroup.Aliases.Contains("baz"));
+            Assert.Equal(3, aliasGroup.Aliases.Count);
+            Assert.True(aliasGroup.Aliases.Contains("baz"));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestRemoveAlias()
         {
             AliasGroup aliasGroup = new AliasGroup("en", new HashSet<string> { "foo", "bar" });
             aliasGroup.Aliases.Remove("bar");
 
-            Assert.AreEqual(1, aliasGroup.Aliases.Count);
-            Assert.IsFalse(aliasGroup.Aliases.Contains("bar"));
+            Assert.Equal(1, aliasGroup.Aliases.Count);
+            Assert.False(aliasGroup.Aliases.Contains("bar"));
         }
     }
 }

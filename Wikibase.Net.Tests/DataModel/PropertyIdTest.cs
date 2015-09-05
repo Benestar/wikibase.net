@@ -1,61 +1,61 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wikibase.DataModel;
+using Xunit;
 
 namespace Wikibase.Tests.DataModel
 {
-    [TestClass]
     public class PropertyIdTest
     {
-        [TestMethod]
+        [Fact]
         public void TestValidSerialization()
         {
             PropertyId PropertyId = new PropertyId("P42");
-            Assert.AreEqual("P42", PropertyId.Serialization);
+            Assert.Equal("P42", PropertyId.Serialization);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestInvalidSerialization()
         {
-            new PropertyId("FooBar");
+            Assert.Throws<ArgumentException>(() => new PropertyId("FooBar"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestItemIdSerialization()
         {
-            new PropertyId("Q123");
+            Assert.Throws<ArgumentException>(() => new PropertyId("Q123"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestPrefixedSerialization()
         {
-            new PropertyId("Foo P123");
+            Assert.Throws<ArgumentException>(() => new PropertyId("Foo P123"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestSuffixedSerialization()
         {
-            new PropertyId("P123foo");
+            Assert.Throws<ArgumentException>(() => new PropertyId("P123foo"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void TestZeroSerialization()
         {
-            new PropertyId("P0123");
+            Assert.Throws<ArgumentException>(() => new PropertyId("P0123"));
         }
 
-        [TestMethod]
+        [Fact]
+        public void TestNullSerialization()
+        {
+            Assert.Throws<ArgumentNullException>(() => new PropertyId(null));
+        }
+
+        [Fact]
         public void TestEquals()
         {
             PropertyId propertyId = new PropertyId("P42");
 
-            Assert.IsTrue(propertyId.Equals(new PropertyId("P42")));
-            Assert.IsFalse(propertyId.Equals(new PropertyId("P123")));
+            Assert.True(propertyId.Equals(new PropertyId("P42")));
+            Assert.False(propertyId.Equals(new PropertyId("P123")));
         }
     }
 }
