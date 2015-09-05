@@ -1,77 +1,172 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MinimalJson;
 
 namespace Wikibase
 {
     /// <summary>
-    /// A statement
+    /// Ranks of statements.
+    /// </summary>
+    public enum Rank
+    {
+        /// <summary>
+        /// Rank not defined.
+        /// </summary>
+        Unknown,
+
+        /// <summary>
+        /// Preferred statement.
+        /// </summary>
+        Preferred,
+
+        /// <summary>
+        /// Normal statement.
+        /// </summary>
+        Normal,
+
+        /// <summary>
+        /// Deprecated statement.
+        /// </summary>
+        Deprecated,
+    }
+
+    /// <summary>
+    /// A statement.
     /// </summary>
     public class Statement : Claim
     {
+        #region Jscon names
+
         /// <summary>
-        /// The rank of the statement
+        /// The name of the <see cref="References"/> property in the serialized json object.
         /// </summary>
-        public string rank { get; private set; }
+        private const String ReferencesJsonName = "references";
 
-        private Dictionary<string, Reference> references = new Dictionary<string, Reference>();
+        /// <summary>
+        /// The name of the <see cref="Rank"/> property in the serialized json object.
+        /// </summary>
+        private const String RankJsonName = "rank";
 
-        internal Statement(Entity entity, JsonObject data) : base(entity, data) { }
-
-        protected override void fillData(JsonObject data)
+        private static Dictionary<Rank, String> _rankJsonNames = new Dictionary<Rank, String>()
         {
-            base.fillData(data);
-            if (data.get("rank") != null)
+             {Rank.Preferred, "preferred" },
+             {Rank.Normal, "normal" },
+             {Rank.Deprecated, "deprecated" }
+        };
+
+        #endregion Jscon names
+
+        /// <summary>
+        /// Gets the rank of the statement.
+        /// </summary>
+        /// <value>The rank of the statement.</value>
+        public Rank Rank
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Internal dictionary, storing the references by its <see cref="Reference.InternalId"/>.
+        /// </summary>
+        private Dictionary<String, Reference> references = new Dictionary<String, Reference>();
+
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
+        /// <param name="entity">Entity to which the statement belongs.</param>
+        /// <param name="data">JSon data to be parsed.</param>
+        internal Statement(Entity entity, JsonObject data)
+            : base(entity, data)
+        {
+        }
+
+        /// <summary>
+        /// Parses the <paramref name="data"/> and adds the results to this instance.
+        /// </summary>
+        /// <param name="data"><see cref="JsonObject"/> to parse.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
+        protected override void FillData(JsonObject data)
+        {
+            if ( data == null )
+                throw new ArgumentNullException("data");
+
+            base.FillData(data);
+            if ( data.get(RankJsonName) != null )
             {
-                this.rank = data.get("rank").asString();
+                var rank = data.get(RankJsonName).asString();
+                if ( _rankJsonNames.Any(x => x.Value == rank) )
+                {
+                    this.Rank = _rankJsonNames.First(x => x.Value == rank).Key;
+                }
+                else
+                {
+                    this.Rank = Rank.Unknown;
+                }
             }
-            if (data.get("references") != null)
+            if ( data.get(ReferencesJsonName) != null )
             {
-                foreach (JsonValue value in data.get("references").asArray())
+                foreach ( JsonValue value in data.get(ReferencesJsonName).asArray() )
                 {
                     Reference reference = new Reference(this, value.asObject());
-                    this.references.Add(reference.internalId, reference);
+                    this.references[reference.InternalId]= reference;
                 }
             }
         }
 
         /// <summary>
-        /// Get all references.
+        /// Gets the references.
         /// </summary>
-        /// <returns>The references</returns>
-        public Dictionary<string, Reference> getReferences()
+        /// <value>The references.</value>
+        public IEnumerable<Reference> References
         {
-            return new Dictionary<string, Reference>(references);
+            get
+            {
+                return references.Values;
+            }
         }
 
         /// <summary>
         /// Add the reference.
         /// </summary>
-        /// <param name="reference">The reference</param>
-        public void addReference(Reference reference)
+        /// <param name="reference">The reference to add.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="reference"/> is <c>null</c>.</exception>
+        public void AddReference(Reference reference)
         {
-            this.references[reference.internalId] = reference;
+            if ( reference == null )
+                throw new ArgumentNullException("reference");
+
+            this.references[reference.InternalId] = reference;
         }
 
         /// <summary>
-        /// Remove the reference.
+        /// Remove a reference from the statement.
         /// </summary>
-        /// <param name="reference">The reference</param>
-        /// <returns>If the reference was removed successfully</returns>
-        public bool removeReference(Reference reference)
+        /// <param name="reference">The reference to be removed.</param>
+        /// <returns><c>true</c> if the reference was removed successfully, <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="reference"/> is <c>null</c>.</exception>
+        public Boolean RemoveReference(Reference reference)
         {
-            return this.references.Remove(reference.internalId);
+            if ( reference == null )
+                throw new ArgumentNullException("reference");
+
+            return this.references.Remove(reference.InternalId);
         }
 
         /// <summary>
-        /// Create a new reference in this statement for the provided snak.
+        /// Create a new reference in this statement with the provided snak.
         /// </summary>
-        /// <param name="snak">The snak</param>
-        /// <returns>The reference</returns>
-        public Reference createReferenceForSnak(Snak snak)
+        /// <param name="snak">The snak which makes up the reference.</param>
+        /// <returns>The newly created reference.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="snak"/> is <c>null</c>.</exception>
+        public Reference CreateReferenceForSnak(Snak snak)
         {
-            return Reference.newFromSnaks(this, new Snak[] { snak });
+            if ( snak == null )
+                throw new ArgumentNullException("snak");
+
+            return new Reference(this, new Snak[] { snak });
         }
     }
 }
