@@ -39,8 +39,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\Http.cs" />
-    <Compile Include="Api\MediaWikiApi.cs" />
     <Compile Include="DataModel\AliasGroup.cs" />
     <Compile Include="DataModel\DataValues\CommonsMediaValue.cs" />
     <Compile Include="DataModel\DataValues\CoordinateValue.cs" />
@@ -69,6 +67,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Api\" />
     <Folder Include="Serialization\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
