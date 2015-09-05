@@ -3,6 +3,7 @@
 
 # Wikibase.net specific files
 coverage.xml
+*.env
 
 # User-specific files
 *.suo
